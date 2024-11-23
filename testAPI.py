@@ -32,6 +32,7 @@ def get_bitcoin_price():
     except requests.exceptions.RequestException as e:
         mb.showerror("Ошибка", f"Произошла ошибка при выполнении запроса: {e}")
 
+# ------------списoк всех криптовалют---------------------------------------
 
 def get_all_coins() -> List[Dict]:
     # URL для получения списка всех криптовалют
@@ -64,6 +65,17 @@ if all_coins:
     for coin in all_coins[:10]:  # Вывод только первых 10 монет
         print(f"Идентификатор: {coin['id']}, Название: {coin['name']}, Символ: {coin['symbol']}")
 
+# ------------Список поддерживаемых валют------------------------------
+
+url = "https://api.coingecko.com/api/v3/simple/supported_vs_currencies"
+
+headers = {"accept": "application/json"}
+
+response = requests.get(url, headers=headers)
+print(f'\nСписок поддерживаемых валют\n')
+print(response.text)
+
+# -------------------------------------------
 
 # Создание графического интерфейса
 window = Tk()
