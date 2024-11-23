@@ -5,6 +5,7 @@ from tkinter import messagebox as mb
 import requests
 import json
 from datetime import datetime as dt
+from typing import List, Dict
 
 # Функция для получения цены биткоина
 def get_bitcoin_price():
@@ -25,13 +26,25 @@ def get_bitcoin_price():
             data = response.json()
             bitcoin_price = data['bitcoin']['usd']
             # return f"Текущая цена биткоина: {bitcoin_price} USD"
-            return f"Текущая цена Bitcoin на {dt.now().strftime('%Y-%m-%d %H:%M:%S')}: ${bitcoin_price:.2f}"
+            t_label.config(text=f"Текущая цена Bitcoin на {dt.now().strftime('%Y-%m-%d %H:%M:%S')}: ${bitcoin_price:.2f}")
         else:
-            return f"Ошибка при получении данных: {response.status_code}"
+            mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
-        return f"Произошла ошибка при выполнении запроса: {e}"
+        mb.showerror("Ошибка", f"Произошла ошибка при выполнении запроса: {e}")
 
+
+# Создание графического интерфейса
+window = Tk()
+window.title("Курс обмена валюты")
+window.geometry("360x300")
 
 # Вызов функции для получения цены биткоина
-result = get_bitcoin_price()
-print(result)
+#result = get_bitcoin_price()
+#print(result)
+
+t_label = ttk.Label(text='')
+t_label.pack(padx=10, pady=10)
+
+Button(text="Получить курс обмена", command=get_bitcoin_price).pack(padx=10, pady=10)
+
+window.mainloop()
