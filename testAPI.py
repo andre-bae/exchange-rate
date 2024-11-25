@@ -6,6 +6,7 @@ import requests
 import json
 from datetime import datetime as dt
 from typing import List, Dict
+from termcolor import colored
 
 # Функция для получения цены биткоина
 def get_bitcoin_price():
@@ -42,7 +43,11 @@ def get_bitcoin_price():
                     crypt_price = crypt_price[:-i] + ' ' + crypt_price[-i:]
                     i +=4
             # return f"Текущая цена биткоина: {crypt_price} USD"
-            t_label.config(text=f"Текущая цена {cr_coin} на {dt.now().strftime('%Y-%m-%d %H:%M:%S')}:\n {crypt_price} {fiat_name}\n")
+            t_label.config(text=f"На {dt.now().strftime('%H:%M %d.%m.%Y')}\n"
+                                f"Текущий курс {cr_coin} составляет  \n"
+                                f"{crypt_price} {fiat_name}\n"
+                                f"( Время последнего обновления курса: "
+                                f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')})")
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
