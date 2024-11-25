@@ -44,13 +44,19 @@ def get_price():
                     crypt_price = crypt_price[:-i] + ' ' + crypt_price[-i:]
                     i +=4
             # return f"Текущая цена биткоина: {crypt_price} USD"
-            t_label2.config(text=f"{dt.now().strftime('%H:%M %d.%m.%Y')}")
+            t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
             t_label4.config(text=f"{cr_coin}")
             t_label6.config(text=f" {crypt_price} ")
             t_label7.config(text=f" {fiat_name}")
-            t_label9.config(text= f"(Последнее обновление курса:{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')})")
-
-
+            t_label8.config(text= f"(Последнее обновление курса: {dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')})")
+            t_label1.pack(side=LEFT, padx=5)
+            t_label2.pack(side=LEFT, padx=5)
+            t_label3.pack(side=LEFT, padx=5)
+            t_label4.pack(side=LEFT, padx=5)
+            t_label5.pack(side=LEFT, padx=5)
+            t_label6.pack(side=LEFT, padx=10)
+            t_label7.pack(side=LEFT, padx=5)
+            t_label8.pack(side=LEFT, padx=5, pady=5)
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
@@ -66,14 +72,15 @@ window.geometry("360x300")
 
 f1 = Frame(window, borderwidth=1, relief=SOLID)
 f1.pack(padx=10)
-f2 = Frame(window, borderwidth=1, relief=SOLID)
-f2.pack(anchor=NW, padx=10, pady=(20,5))
-f3 = Frame(window, borderwidth=1, relief=SOLID)
+f2 = Frame(window)
+f2.pack(anchor=NW, padx=10, pady=(10,0))
+f3 = Frame(window)
 f3.pack(anchor=NW, padx=10)
-f4 = Frame(window, borderwidth=1, relief=SOLID)
-f4.pack(anchor=NW, padx=10)
-f5 = Frame(window, borderwidth=1, relief=SOLID)
+f4 = Frame(window)
+f4.pack(anchor=NW, padx=10, pady=5)
+f5 = Frame(window)
 f5.pack(anchor=NW, padx=10)
+
 crypt_label = ttk.Label(f1, text='Криптовалюта')
 crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
 
@@ -111,32 +118,15 @@ combobox_fiat.grid(row=1, column=1, padx=10, pady=10, sticky=EW)
 
 Button(f1, text="Получить курс обмена", command=get_price).grid(row=2, column=1, padx=10, pady=10, sticky=EW)
 
-t_label1 = ttk.Label(f2, text='На ')
-t_label1.pack(side=LEFT)
-
+t_label1 = ttk.Label(f2, text='На ', font=("Helvetica 10"))
 t_label2 = ttk.Label(f2, text='', font=("Helvetica 10 bold"))
-t_label2.pack(side=LEFT, pady=5)
-
-t_label3 = ttk.Label(f3, text='Текущий курс ')
-t_label3.pack(side=LEFT, padx=5, pady=5)
-
+t_label3 = ttk.Label(f3, text='Текущий курс ', font=("Helvetica 10"))
 t_label4 = ttk.Label(f3, text='', font=("Helvetica 10 bold"))
-t_label4.pack(side=LEFT, padx=5, pady=5)
-
-t_label5 = ttk.Label(f3, text=' составляет  ')
-t_label5.pack(side=LEFT, padx=5, pady=5)
-
+t_label5 = ttk.Label(f3, text=' составляет  ', font=("Helvetica 10"))
 t_label6 = ttk.Label(f4, text='', font=("Helvetica 14 bold"), foreground='Red', background='White', borderwidth=1, relief=SOLID)
-t_label6.pack(side=LEFT, padx=10, pady=10)
-
 t_label7 = ttk.Label(f4, text='', font=("Helvetica 10 bold"))
-t_label7.pack(side=LEFT, padx=5, pady=5)
+t_label8 = ttk.Label(f5, text='')
 
-# t_label8 = ttk.Label(f5, text=f"(Последнее обновление курса:")
-# t_label8.pack(side=LEFT, padx=5, pady=5)
-
-t_label9 = ttk.Label(f5, text='')
-t_label9.pack(side=LEFT, padx=5, pady=5)
 
 
 window.mainloop()
