@@ -3,23 +3,24 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox as mb
 import requests
-import json
+# import json
 from datetime import datetime as dt
-from typing import List, Dict
-from termcolor import colored
+# from typing import List, Dict
+# from termcolor import colored
 
 # Функция для получения цены биткоина
-def get_bitcoin_price():
+def get_price():
     cr_coin = combobox_crypta.get()
     ids = cr_coin.lower()
     fi = combobox_fiat.get()
     fiat_name = fiat[fi]
-    print(fiat_name)
+    fi1 = fi.lower()
+#    print(fiat_name)
     # Настройка параметров запроса
     url = "https://api.coingecko.com/api/v3/simple/price"
     params = {
-        "ids": ids, # "bitcoin",
-        "vs_currencies": fi,
+        "ids": ids,
+        "vs_currencies": fi1,
         "include_last_updated_at": "true"
     }
     headers = {"Accepts": "application/json"}
@@ -34,7 +35,7 @@ def get_bitcoin_price():
             print(data)
             update_time = data[ids]['last_updated_at']
             print("Время последнего обновления курса: ", dt.fromtimestamp(update_time).strftime('%Y-%m-%d %H:%M:%S'))
-            price = data[ids][fi]
+            price = data[ids][fi1]
             crypt_price = f"{price:.2f}"
             len1 = len(crypt_price)
             if len1 >6:
@@ -57,15 +58,10 @@ def get_bitcoin_price():
 
 # Создание графического интерфейса
 window = Tk()
-window.title("Курс обмена валюты")
+window.title("Курсы криптовалют к фиатным")
 window.geometry("360x300")
 
-# Вызов функции для получения цены биткоина
-#result = get_bitcoin_price()
-#print(result)
-
-t_label = ttk.Label(text='')
-t_label.pack(padx=10, pady=10)
+crypt_label = ttk.Label(text='Криптовалюта').pack() # grid(row=0, column=0, padx=10, pady=10)
 
 crypta = {
     "Bitcoin": "btc",
@@ -79,23 +75,24 @@ crypta = {
 cr = list(crypta.keys())
 cr_var = StringVar(value=cr[0])
 
-combobox_crypta = ttk.Combobox(window, textvariable=cr_var, values=cr, state="readonly")
-combobox_crypta.pack()
+combobox_crypta = ttk.Combobox(window, textvariable=cr_var, values=cr, state="readonly").pack() # grid(row=0, column=1, padx=10, pady=10)
 
 
+fiat_label = ttk.Label(text='Фиатные валюты').pack() # grid(row=1, column=0, padx=10, pady=10)
 fiat = {
-    "usd": "Долларов США",
-    "rub": "Рублей",
-    "eur": "Евро"
+    "USD": "Долларов США",
+    "Rub": "Рублей",
+    "EUR": "Евро"
 }
 
 fi = list(fiat.keys())
 fi_var = StringVar(value=fi[0])
 
-combobox_fiat = ttk.Combobox(window, textvariable=fi_var, values=fi, state="readonly")
-combobox_fiat.pack()
+combobox_fiat = ttk.Combobox(window, textvariable=fi_var, values=fi, state="readonly").pack() # grid(row=1, column=1, padx=10, pady=10)
 
 
-Button(text="Получить курс обмена", command=get_bitcoin_price).pack(padx=10, pady=10)
+Button(text="Получить курс обмена", command=get_price).pack() # grid(row=2, column=0, padx=10, pady=10)
+
+t_label = ttk.Label(text='').pack() # grid(row=3, column=0, padx=10, pady=10)
 
 window.mainloop()
