@@ -12,9 +12,9 @@ from datetime import datetime as dt
 def get_price():
     cr_coin = combobox_crypta.get()
     ids = cr_coin.lower()
-    fi = combobox_fiat.get()
-    fiat_name = fiat[fi]
-    fi1 = fi.lower()
+    fi0 = combobox_fiat.get()
+    fiat_name = fiat[fi0]
+    fi1 = fi0.lower()
 #    print(fiat_name)
     # Настройка параметров запроса
     url = "https://api.coingecko.com/api/v3/simple/price"
@@ -47,7 +47,7 @@ def get_price():
             t_label.config(text=f"На {dt.now().strftime('%H:%M %d.%m.%Y')}\n"
                                 f"Текущий курс {cr_coin} составляет  \n"
                                 f"{crypt_price} {fiat_name}\n"
-                                f"( Время последнего обновления курса: "
+                                f"(Последнее обновление курса: "
                                 f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')})")
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
@@ -62,7 +62,7 @@ window.title("Курсы криптовалют к фиатным")
 window.geometry("360x300")
 
 crypt_label = ttk.Label(text='Криптовалюта')
-crypt_label.pack() # grid(row=0, column=0, padx=10, pady=10)
+crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=EW)
 
 crypta = {
     "Bitcoin": "btc",
@@ -77,11 +77,11 @@ cr = list(crypta.keys())
 cr_var = StringVar(value=cr[0])
 
 combobox_crypta = ttk.Combobox(window, textvariable=cr_var, values=cr, state="readonly")
-combobox_crypta.pack() # grid(row=0, column=1, padx=10, pady=10)
+combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
 
 
 fiat_label = ttk.Label(text='Фиатные валюты')
-fiat_label.pack() # grid(row=1, column=0, padx=10, pady=10)
+fiat_label.grid(row=1, column=0, padx=10, pady=10, sticky=EW)
 
 fiat = {
     "USD": "Долларов США",
@@ -93,13 +93,13 @@ fi = list(fiat.keys())
 fi_var = StringVar(value=fi[0])
 
 combobox_fiat = ttk.Combobox(window, textvariable=fi_var, values=fi, state="readonly")
-combobox_fiat.pack() # grid(row=1, column=1, padx=10, pady=10)
+combobox_fiat.grid(row=1, column=1, padx=10, pady=10, sticky=EW)
 
 
-Button(text="Получить курс обмена", command=get_price).pack() # grid(row=2, column=0, padx=10, pady=10)
+Button(text="Получить курс обмена", command=get_price).grid(row=2, column=0, padx=10, pady=10, sticky=EW)
 
 t_label = ttk.Label(text='')
-t_label.pack() # grid(row=3, column=0, padx=10, pady=10)
+t_label.grid(row=3, column=0, padx=10, pady=10, columnspan=2, sticky=EW)
 
 window.mainloop()
 
