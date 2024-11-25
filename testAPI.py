@@ -61,7 +61,8 @@ window = Tk()
 window.title("Курсы криптовалют к фиатным")
 window.geometry("360x300")
 
-crypt_label = ttk.Label(text='Криптовалюта').pack() # grid(row=0, column=0, padx=10, pady=10)
+crypt_label = ttk.Label(text='Криптовалюта')
+crypt_label.pack() # grid(row=0, column=0, padx=10, pady=10)
 
 crypta = {
     "Bitcoin": "btc",
@@ -75,10 +76,13 @@ crypta = {
 cr = list(crypta.keys())
 cr_var = StringVar(value=cr[0])
 
-combobox_crypta = ttk.Combobox(window, textvariable=cr_var, values=cr, state="readonly").pack() # grid(row=0, column=1, padx=10, pady=10)
+combobox_crypta = ttk.Combobox(window, textvariable=cr_var, values=cr, state="readonly")
+combobox_crypta.pack() # grid(row=0, column=1, padx=10, pady=10)
 
 
-fiat_label = ttk.Label(text='Фиатные валюты').pack() # grid(row=1, column=0, padx=10, pady=10)
+fiat_label = ttk.Label(text='Фиатные валюты')
+fiat_label.pack() # grid(row=1, column=0, padx=10, pady=10)
+
 fiat = {
     "USD": "Долларов США",
     "Rub": "Рублей",
@@ -88,11 +92,14 @@ fiat = {
 fi = list(fiat.keys())
 fi_var = StringVar(value=fi[0])
 
-combobox_fiat = ttk.Combobox(window, textvariable=fi_var, values=fi, state="readonly").pack() # grid(row=1, column=1, padx=10, pady=10)
+combobox_fiat = ttk.Combobox(window, textvariable=fi_var, values=fi, state="readonly")
+combobox_fiat.pack() # grid(row=1, column=1, padx=10, pady=10)
 
 
 Button(text="Получить курс обмена", command=get_price).pack() # grid(row=2, column=0, padx=10, pady=10)
 
-t_label = ttk.Label(text='').pack() # grid(row=3, column=0, padx=10, pady=10)
+t_label = ttk.Label(text='')
+t_label.pack() # grid(row=3, column=0, padx=10, pady=10)
 
 window.mainloop()
+
