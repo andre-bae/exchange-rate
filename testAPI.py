@@ -13,7 +13,8 @@ def get_bitcoin_price():
     url = "https://api.coingecko.com/api/v3/simple/price"
     params = {
         "ids": "bitcoin",
-        "vs_currencies": "usd"
+        "vs_currencies": "usd",
+        "include_last_updated_at": "true"
     }
     headers = {"Accepts": "application/json"}
 
@@ -24,9 +25,12 @@ def get_bitcoin_price():
         # Обработка ответа
         if response.status_code == 200:
             data = response.json()
+            print(data)
+            update_time = data['bitcoin']['last_updated_at']
+            print("Время последнего обновления курса: ", dt.fromtimestamp(update_time).strftime('%Y-%m-%d %H:%M:%S'))
             bitcoin_price = data['bitcoin']['usd']
             # return f"Текущая цена биткоина: {bitcoin_price} USD"
-            t_label.config(text=f"Текущая цена Bitcoin на {dt.now().strftime('%Y-%m-%d %H:%M:%S')}: ${bitcoin_price:.2f}")
+            t_label.config(text=f"Текущая цена Bitcoin на {dt.now().strftime('%Y-%m-%d %H:%M:%S')}: ${bitcoin_price:.2f}\n")
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
@@ -74,7 +78,17 @@ headers = {"accept": "application/json"}
 response = requests.get(url, headers=headers)
 print(f'\nСписок поддерживаемых валют\n')
 print(response.text)
-
+try:
+    with open('best_coins.txt', 'w', encoding="utf8") as file:
+        file.write(response.text)
+except IOError:
+    print("Ошибка ввода-вывода.")
+except OSError:
+    print("Ошибка операционной системы.")
+except UnicodeEncodeError:
+    print("Ошибка кодирования текста.")
+except Exception as e:
+    print(f"Неизвестная ошибка: {e}")
 # -------------------------------------------
 
 # Создание графического интерфейса
