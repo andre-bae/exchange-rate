@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox as mb
 import requests
 from datetime import datetime as dt
+import os
 
 
 # Функция для получения цены кринтовалюты
@@ -61,6 +62,7 @@ def get_price():
 # ---------------------Создание графического интерфейса----------------------
 
 window = Tk()
+window.iconbitmap('bitcoin.ico')
 window.title("Курсы криптовалют к фиатным")
 window.geometry("360x300")
 
