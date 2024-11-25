@@ -9,10 +9,12 @@ from typing import List, Dict
 
 # Функция для получения цены биткоина
 def get_bitcoin_price():
+    ids = combobox_crypta.get().lower()
+    print(ids)
     # Настройка параметров запроса
     url = "https://api.coingecko.com/api/v3/simple/price"
     params = {
-        "ids": "bitcoin",
+        "ids": ids, # "bitcoin",
         "vs_currencies": "usd",
         "include_last_updated_at": "true"
     }
@@ -26,9 +28,9 @@ def get_bitcoin_price():
         if response.status_code == 200:
             data = response.json()
             print(data)
-            update_time = data['bitcoin']['last_updated_at']
+            update_time = data[ids]['last_updated_at']
             print("Время последнего обновления курса: ", dt.fromtimestamp(update_time).strftime('%Y-%m-%d %H:%M:%S'))
-            bitcoin_price = data['bitcoin']['usd']
+            bitcoin_price = data[ids]['usd']
             # return f"Текущая цена биткоина: {bitcoin_price} USD"
             t_label.config(text=f"Текущая цена Bitcoin на {dt.now().strftime('%Y-%m-%d %H:%M:%S')}: ${bitcoin_price:.2f}\n")
         else:
@@ -36,59 +38,6 @@ def get_bitcoin_price():
     except requests.exceptions.RequestException as e:
         mb.showerror("Ошибка", f"Произошла ошибка при выполнении запроса: {e}")
 
-# ------------списoк всех криптовалют---------------------------------------
-
-def get_all_coins() -> List[Dict]:
-    # URL для получения списка всех криптовалют
-    url = "https://api.coingecko.com/api/v3/coins/list"
-
-    try:
-        # Выполнить GET-запрос к API CoinGecko
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            # Преобразовать JSON в список словарей
-            data = response.json()
-
-            return data
-        else:
-            print(f"Ошибка при получении данных: {response.status_code}")
-            return []
-
-    except requests.exceptions.RequestException as e:
-        print(f"Произошла ошибка при выполнении запроса: {e}")
-        return []
-
-
-# Вызов функции для получения списка всех криптовалют
-all_coins = get_all_coins()
-
-# Вывод результатов (пример)
-if all_coins:
-    print('Список первых 10 из всех криптовалют')
-    for coin in all_coins[:10]:  # Вывод только первых 10 монет
-        print(f"Идентификатор: {coin['id']}, Название: {coin['name']}, Символ: {coin['symbol']}")
-
-# ------------Список поддерживаемых валют------------------------------
-
-url = "https://api.coingecko.com/api/v3/simple/supported_vs_currencies"
-
-headers = {"accept": "application/json"}
-
-response = requests.get(url, headers=headers)
-print(f'\nСписок поддерживаемых валют\n')
-print(response.text)
-try:
-    with open('best_coins.txt', 'w', encoding="utf8") as file:
-        file.write(response.text)
-except IOError:
-    print("Ошибка ввода-вывода.")
-except OSError:
-    print("Ошибка операционной системы.")
-except UnicodeEncodeError:
-    print("Ошибка кодирования текста.")
-except Exception as e:
-    print(f"Неизвестная ошибка: {e}")
 # -------------------------------------------
 
 # Создание графического интерфейса
@@ -104,5 +53,33 @@ t_label = ttk.Label(text='')
 t_label.pack(padx=10, pady=10)
 
 Button(text="Получить курс обмена", command=get_bitcoin_price).pack(padx=10, pady=10)
+
+def selected(event):
+    global num
+    num = int(cb_kol.get())
+
+crypta = {
+    "Bitcoin": "btc",
+    "Ethereum": "eth",
+    "Binance Coin": "bnb"
+}
+#cr = StringVar(value=crypta["btc"])
+#label_kol = ttk.Label(window,  text='Выберите криптовалюту', font=("Arial", 14))
+#label_kol.pack(side=LEFT, padx=5, pady=5)
+#cb_kol = ttk.Combobox(window, textvariable=cr, font=("Arial", 14), values=crypta[],
+#                      state="readonly", width=10, height=4)
+#cb_kol.pack(side=LEFT, padx=5, pady=5)
+#cb_kol.bind("<<ComboboxSelected>>", selected)
+
+cr = list(crypta.keys())
+cr_var = StringVar(value=cr[0])
+#cr.set(crypta.keys()[0])  # Устанавливаем первый ключ по умолчанию
+combobox_crypta = ttk.Combobox(window, textvariable=cr_var, values=cr, state="readonly")
+
+#for key in crypta:
+#    combobox['values'] += tuple(crypta[key])
+combobox_crypta.pack()
+
+# cb_kol.bind("<<ComboboxSelected>>", selected)
 
 window.mainloop()
