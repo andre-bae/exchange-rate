@@ -40,15 +40,17 @@ def get_price():
             len1 = len(crypt_price)
             if len1 >6:
                 i = 6
-                while i< len1:
+                while i <= len1:
                     crypt_price = crypt_price[:-i] + ' ' + crypt_price[-i:]
                     i +=4
             # return f"Текущая цена биткоина: {crypt_price} USD"
-            t_label.config(text=f"На {dt.now().strftime('%H:%M %d.%m.%Y')}\n"
-                                f"Текущий курс {cr_coin} составляет  \n"
-                                f"{crypt_price} {fiat_name}\n"
-                                f"(Последнее обновление курса: "
-                                f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')})")
+            t_label2.config(text=f"{dt.now().strftime('%H:%M %d.%m.%Y')}")
+            t_label4.config(text=f"{cr_coin}")
+            t_label6.config(text=f" {crypt_price} ")
+            t_label7.config(text=f" {fiat_name}")
+            t_label9.config(text= f"(Последнее обновление курса:{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')})")
+
+
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
@@ -61,8 +63,19 @@ window = Tk()
 window.title("Курсы криптовалют к фиатным")
 window.geometry("360x300")
 
-crypt_label = ttk.Label(text='Криптовалюта')
-crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=EW)
+
+f1 = Frame(window, borderwidth=1, relief=SOLID)
+f1.pack(padx=10)
+f2 = Frame(window, borderwidth=1, relief=SOLID)
+f2.pack(anchor=NW, padx=10, pady=(20,5))
+f3 = Frame(window, borderwidth=1, relief=SOLID)
+f3.pack(anchor=NW, padx=10)
+f4 = Frame(window, borderwidth=1, relief=SOLID)
+f4.pack(anchor=NW, padx=10)
+f5 = Frame(window, borderwidth=1, relief=SOLID)
+f5.pack(anchor=NW, padx=10)
+crypt_label = ttk.Label(f1, text='Криптовалюта')
+crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
 
 crypta = {
     "Bitcoin": "btc",
@@ -76,11 +89,11 @@ crypta = {
 cr = list(crypta.keys())
 cr_var = StringVar(value=cr[0])
 
-combobox_crypta = ttk.Combobox(window, textvariable=cr_var, values=cr, state="readonly")
+combobox_crypta = ttk.Combobox(f1, textvariable=cr_var, values=cr, state="readonly")
 combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
 
 
-fiat_label = ttk.Label(text='Фиатные валюты')
+fiat_label = ttk.Label(f1, text='Фиатные валюты')
 fiat_label.grid(row=1, column=0, padx=10, pady=10, sticky=EW)
 
 fiat = {
@@ -92,14 +105,39 @@ fiat = {
 fi = list(fiat.keys())
 fi_var = StringVar(value=fi[0])
 
-combobox_fiat = ttk.Combobox(window, textvariable=fi_var, values=fi, state="readonly")
+combobox_fiat = ttk.Combobox(f1, textvariable=fi_var, values=fi, state="readonly")
 combobox_fiat.grid(row=1, column=1, padx=10, pady=10, sticky=EW)
 
 
-Button(text="Получить курс обмена", command=get_price).grid(row=2, column=0, padx=10, pady=10, sticky=EW)
+Button(f1, text="Получить курс обмена", command=get_price).grid(row=2, column=1, padx=10, pady=10, sticky=EW)
 
-t_label = ttk.Label(text='')
-t_label.grid(row=3, column=0, padx=10, pady=10, columnspan=2, sticky=EW)
+t_label1 = ttk.Label(f2, text='На ')
+t_label1.pack(side=LEFT)
+
+t_label2 = ttk.Label(f2, text='', font=("Helvetica 10 bold"))
+t_label2.pack(side=LEFT, pady=5)
+
+t_label3 = ttk.Label(f3, text='Текущий курс ')
+t_label3.pack(side=LEFT, padx=5, pady=5)
+
+t_label4 = ttk.Label(f3, text='', font=("Helvetica 10 bold"))
+t_label4.pack(side=LEFT, padx=5, pady=5)
+
+t_label5 = ttk.Label(f3, text=' составляет  ')
+t_label5.pack(side=LEFT, padx=5, pady=5)
+
+t_label6 = ttk.Label(f4, text='', font=("Helvetica 14 bold"), foreground='Red', background='White', borderwidth=1, relief=SOLID)
+t_label6.pack(side=LEFT, padx=10, pady=10)
+
+t_label7 = ttk.Label(f4, text='', font=("Helvetica 10 bold"))
+t_label7.pack(side=LEFT, padx=5, pady=5)
+
+# t_label8 = ttk.Label(f5, text=f"(Последнее обновление курса:")
+# t_label8.pack(side=LEFT, padx=5, pady=5)
+
+t_label9 = ttk.Label(f5, text='')
+t_label9.pack(side=LEFT, padx=5, pady=5)
+
 
 window.mainloop()
 
