@@ -34,17 +34,15 @@ def get_bitcoin_price():
             update_time = data[ids]['last_updated_at']
             print("Время последнего обновления курса: ", dt.fromtimestamp(update_time).strftime('%Y-%m-%d %H:%M:%S'))
             price = data[ids][fi]
-            bitcoin_price = f"{price:.2f}"
-            len1 = len(bitcoin_price)
+            crypt_price = f"{price:.2f}"
+            len1 = len(crypt_price)
             if len1 >6:
-                bitcoin_price1 = bitcoin_price
                 i = 6
                 while i< len1:
-                    bitcoin_price1 = bitcoin_price1[:-i] + ' ' + bitcoin_price1[-i:]
-                    print(bitcoin_price, bitcoin_price1)
+                    crypt_price = crypt_price[:-i] + ' ' + crypt_price[-i:]
                     i +=4
-            # return f"Текущая цена биткоина: {bitcoin_price} USD"
-            t_label.config(text=f"Текущая цена {cr_coin} на {dt.now().strftime('%Y-%m-%d %H:%M:%S')}:\n {bitcoin_price} {fiat_name}\n")
+            # return f"Текущая цена биткоина: {crypt_price} USD"
+            t_label.config(text=f"Текущая цена {cr_coin} на {dt.now().strftime('%Y-%m-%d %H:%M:%S')}:\n {crypt_price} {fiat_name}\n")
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
