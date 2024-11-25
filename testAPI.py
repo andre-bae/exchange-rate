@@ -9,8 +9,8 @@ from typing import List, Dict
 
 # Функция для получения цены биткоина
 def get_bitcoin_price():
-    ids = combobox_crypta.get().lower()
-    print(ids)
+    cr_coin = combobox_crypta.get()
+    ids = cr_coin.lower()
     # Настройка параметров запроса
     url = "https://api.coingecko.com/api/v3/simple/price"
     params = {
@@ -32,7 +32,7 @@ def get_bitcoin_price():
             print("Время последнего обновления курса: ", dt.fromtimestamp(update_time).strftime('%Y-%m-%d %H:%M:%S'))
             bitcoin_price = data[ids]['usd']
             # return f"Текущая цена биткоина: {bitcoin_price} USD"
-            t_label.config(text=f"Текущая цена Bitcoin на {dt.now().strftime('%Y-%m-%d %H:%M:%S')}: ${bitcoin_price:.2f}\n")
+            t_label.config(text=f"Текущая цена {cr_coin} на {dt.now().strftime('%Y-%m-%d %H:%M:%S')}: ${bitcoin_price:.2f}\n")
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
@@ -61,7 +61,10 @@ def selected(event):
 crypta = {
     "Bitcoin": "btc",
     "Ethereum": "eth",
-    "Binance Coin": "bnb"
+    "Tether": "USDT",
+    "solana": "sol",
+    "Dogecoin": "doge",
+    "Cardano": "ada"
 }
 #cr = StringVar(value=crypta["btc"])
 #label_kol = ttk.Label(window,  text='Выберите криптовалюту', font=("Arial", 14))
