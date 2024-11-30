@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox as mb
 import requests
 from datetime import datetime as dt
-import os
+# import os
 
 def choice():
     if ord(combobox_crypta.get()[0]) < 1000:
@@ -26,7 +26,6 @@ def exchange():
             data = response.json()
 #            print(data)
             update_time = data['time_last_update_unix']
-#            print("Время последнего обновления курса: ", dt.fromtimestamp(update_time).strftime('%Y-%m-%d %H:%M:%S'))
 
             if target_code in data['rates']:
                 exchange_rate = data['rates'][target_code]
@@ -39,7 +38,8 @@ def exchange():
                 t_label4.config(text=f"{cr_coin}")
                 t_label6.config(text=f" {crypt_price} ")
                 t_label7.config(text=f" {fiat_name}")
-                t_label8.config(text= f"( Последнее обновление курса: {dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')} )")
+                t_label8.config(text= f"( Последнее обновление курса: "
+                                      f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')} )")
                 t_label1.pack(side=LEFT, padx=5)
                 t_label2.pack(side=LEFT, padx=5)
                 t_label3.pack(side=LEFT, padx=5)
@@ -82,7 +82,6 @@ def get_price():
             data = response.json()
 #            print(data)
             update_time = data[ids]['last_updated_at']
-#            print("Время последнего обновления курса: ", dt.fromtimestamp(update_time).strftime('%Y-%m-%d %H:%M:%S'))
             price = data[ids][fi1]
             crypt_price = f"{price:.2f}"
 
@@ -98,7 +97,8 @@ def get_price():
             t_label4.config(text=f"{cr_coin}")
             t_label6.config(text=f" {crypt_price} ")
             t_label7.config(text=f" {fiat_name}")
-            t_label8.config(text= f"( Последнее обновление курса: {dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')} )")
+            t_label8.config(text= f"( Последнее обновление курса: "
+                                  f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')} )")
             t_label1.pack(side=LEFT, padx=5)
             t_label2.pack(side=LEFT, padx=5)
             t_label3.pack(side=LEFT, padx=5)
@@ -163,7 +163,8 @@ crypta = {
 cr = list(crypta.keys())
 cr_var = StringVar(value=cr[0])
 
-combobox_crypta = ttk.Combobox(f1, textvariable=cr_var, values=cr, state="readonly", width=28, height=20)
+combobox_crypta = ttk.Combobox(f1, textvariable=cr_var,
+                               values=cr, state="readonly", width=28, height=20)
 combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
 
 # Выбор фиатной валюты
@@ -183,14 +184,16 @@ combobox_fiat = ttk.Combobox(f1, textvariable=fi_var, values=fi, state="readonly
 combobox_fiat.grid(row=1, column=1, padx=10, pady=10, sticky=EW)
 
 # Получение курса
-Button(f1, text="Получить курс обмена", command=choice).grid(row=2, column=1, padx=10, pady=10, sticky=EW)
+Button(f1, text="Получить курс обмена", command=choice).grid(row=2, column=1,
+                                                             padx=10, pady=10, sticky=EW)
 
 t_label1 = ttk.Label(f2, text='На ', font="Helvetica 10")
 t_label2 = ttk.Label(f2, text='', font="Helvetica 10 bold")
 t_label3 = ttk.Label(f3, text='Текущий курс ', font="Helvetica 10")
 t_label4 = ttk.Label(f3, text='', font="Helvetica 10 bold")
 t_label5 = ttk.Label(f3, text=' составляет  ', font="Helvetica 10")
-t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold", foreground='Red', background='White', borderwidth=1, relief=SOLID)
+t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold",
+                     foreground='Red', background='White', borderwidth=1, relief=SOLID)
 t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
 t_label8 = ttk.Label(f5, text='')
 
