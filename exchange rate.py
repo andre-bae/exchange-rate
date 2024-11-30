@@ -3,9 +3,9 @@ from tkinter import ttk
 from tkinter import messagebox as mb
 import requests
 from datetime import datetime as dt
-# import os
 
 
+# Функция выбора базовой валюты: крипта или фиатная
 def choice():
     if ord(combobox_crypta.get()[0]) < 1000:
         get_price()
@@ -13,6 +13,7 @@ def choice():
         exchange()
 
 
+# Функция оформления вывода результата в метки
 def label_config(coin, price, name, time):
     t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
     t_label4.config(text=f"{coin}")
@@ -27,7 +28,6 @@ def label_config(coin, price, name, time):
     t_label5.pack(side=LEFT, padx=5)
     t_label6.pack(side=LEFT, padx=10)
     t_label7.pack(side=LEFT, padx=5)
-#                t_label8.pack_forget()
 
 
 # Функция для получения цены фиатной валюты
@@ -41,32 +41,12 @@ def exchange():
         try:
             response = requests.get(f'https://open.er-api.com/v6/latest/{base_code}')
             response.raise_for_status()
-
             data = response.json()
-#            print(data)
             update_time = data['time_last_update_unix']
-
             if target_code in data['rates']:
                 exchange_rate = data['rates'][target_code]
-#                base = base_code # currencies[base_code]
-#                target = target_code # currencies[target_code]
                 crypt_price = f"{exchange_rate}"
-#                mb.showinfo("Курс обмена", f"Курс {exchange_rate:.1f} {target} за 1 {base}")
                 label_config(cr_coin, crypt_price, fiat_name, update_time)
-#                t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
-#                t_label4.config(text=f"{cr_coin}")
-#                t_label6.config(text=f" {crypt_price} ")
-#                t_label7.config(text=f" {fiat_name}")
-#                t_label8.config(text= f"( Последнее обновление курса: "
-#                                      f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')} )")
-#                t_label1.pack(side=LEFT, padx=5)
-#                t_label2.pack(side=LEFT, padx=5)
-#                t_label3.pack(side=LEFT, padx=5)
-#                t_label4.pack(side=LEFT, padx=5)
-#                t_label5.pack(side=LEFT, padx=5)
-#                t_label6.pack(side=LEFT, padx=10)
-#                t_label7.pack(side=LEFT, padx=5)
-#                t_label8.pack_forget()
             else:
                 mb.showerror("Ошибка", f"Валюта {target_code} не найдена")
         except Exception as e:
@@ -99,7 +79,6 @@ def get_price():
         # Обработка ответа
         if response.status_code == 200:
             data = response.json()
-#            print(data)
             update_time = data[ids]['last_updated_at']
             price = data[ids][fi1]
             crypt_price = f"{price:.2f}"
@@ -111,23 +90,7 @@ def get_price():
                 while i <= len1:
                     crypt_price = crypt_price[:-i] + ' ' + crypt_price[-i:]
                     i +=4
-
             label_config(cr_coin, crypt_price, fiat_name, update_time)
-#            t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
-#            t_label4.config(text=f"{cr_coin}")
-#            t_label6.config(text=f" {crypt_price} ")
-#            t_label7.config(text=f" {fiat_name}")
-#            t_label8.config(text= f"( Последнее обновление курса: "
-#                                  f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')} )")
-#            t_label1.pack(side=LEFT, padx=5)
-#            t_label2.pack(side=LEFT, padx=5)
-#            t_label3.pack(side=LEFT, padx=5)
-#            t_label4.pack(side=LEFT, padx=5)
-#            t_label5.pack(side=LEFT, padx=5)
-#            t_label6.pack(side=LEFT, padx=10)
-#            t_label7.pack(side=LEFT, padx=5)
-#            t_label8.pack(side=LEFT, padx=5, pady=5)
-
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
