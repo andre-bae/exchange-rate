@@ -5,11 +5,30 @@ import requests
 from datetime import datetime as dt
 # import os
 
+
 def choice():
     if ord(combobox_crypta.get()[0]) < 1000:
         get_price()
     else:
         exchange()
+
+
+def label_config(coin, price, name, time):
+    t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
+    t_label4.config(text=f"{coin}")
+    t_label6.config(text=f" {price} ")
+    t_label7.config(text=f" {name}")
+    t_label8.config(text=f"( Последнее обновление курса: "
+                         f"{dt.fromtimestamp(time).strftime('%H:%M:%S %d.%m.%Y')} )")
+    t_label1.pack(side=LEFT, padx=5)
+    t_label2.pack(side=LEFT, padx=5)
+    t_label3.pack(side=LEFT, padx=5)
+    t_label4.pack(side=LEFT, padx=5)
+    t_label5.pack(side=LEFT, padx=5)
+    t_label6.pack(side=LEFT, padx=10)
+    t_label7.pack(side=LEFT, padx=5)
+#                t_label8.pack_forget()
+
 
 # Функция для получения цены фиатной валюты
 def exchange():
@@ -33,20 +52,20 @@ def exchange():
 #                target = target_code # currencies[target_code]
                 crypt_price = f"{exchange_rate}"
 #                mb.showinfo("Курс обмена", f"Курс {exchange_rate:.1f} {target} за 1 {base}")
-
-                t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
-                t_label4.config(text=f"{cr_coin}")
-                t_label6.config(text=f" {crypt_price} ")
-                t_label7.config(text=f" {fiat_name}")
-                t_label8.config(text= f"( Последнее обновление курса: "
-                                      f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')} )")
-                t_label1.pack(side=LEFT, padx=5)
-                t_label2.pack(side=LEFT, padx=5)
-                t_label3.pack(side=LEFT, padx=5)
-                t_label4.pack(side=LEFT, padx=5)
-                t_label5.pack(side=LEFT, padx=5)
-                t_label6.pack(side=LEFT, padx=10)
-                t_label7.pack(side=LEFT, padx=5)
+                label_config(cr_coin, crypt_price, fiat_name, update_time)
+#                t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
+#                t_label4.config(text=f"{cr_coin}")
+#                t_label6.config(text=f" {crypt_price} ")
+#                t_label7.config(text=f" {fiat_name}")
+#                t_label8.config(text= f"( Последнее обновление курса: "
+#                                      f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')} )")
+#                t_label1.pack(side=LEFT, padx=5)
+#                t_label2.pack(side=LEFT, padx=5)
+#                t_label3.pack(side=LEFT, padx=5)
+#                t_label4.pack(side=LEFT, padx=5)
+#                t_label5.pack(side=LEFT, padx=5)
+#                t_label6.pack(side=LEFT, padx=10)
+#                t_label7.pack(side=LEFT, padx=5)
 #                t_label8.pack_forget()
             else:
                 mb.showerror("Ошибка", f"Валюта {target_code} не найдена")
@@ -93,20 +112,21 @@ def get_price():
                     crypt_price = crypt_price[:-i] + ' ' + crypt_price[-i:]
                     i +=4
 
-            t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
-            t_label4.config(text=f"{cr_coin}")
-            t_label6.config(text=f" {crypt_price} ")
-            t_label7.config(text=f" {fiat_name}")
-            t_label8.config(text= f"( Последнее обновление курса: "
-                                  f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')} )")
-            t_label1.pack(side=LEFT, padx=5)
-            t_label2.pack(side=LEFT, padx=5)
-            t_label3.pack(side=LEFT, padx=5)
-            t_label4.pack(side=LEFT, padx=5)
-            t_label5.pack(side=LEFT, padx=5)
-            t_label6.pack(side=LEFT, padx=10)
-            t_label7.pack(side=LEFT, padx=5)
-            t_label8.pack(side=LEFT, padx=5, pady=5)
+            label_config(cr_coin, crypt_price, fiat_name, update_time)
+#            t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
+#            t_label4.config(text=f"{cr_coin}")
+#            t_label6.config(text=f" {crypt_price} ")
+#            t_label7.config(text=f" {fiat_name}")
+#            t_label8.config(text= f"( Последнее обновление курса: "
+#                                  f"{dt.fromtimestamp(update_time).strftime('%H:%M:%S %d.%m.%Y')} )")
+#            t_label1.pack(side=LEFT, padx=5)
+#            t_label2.pack(side=LEFT, padx=5)
+#            t_label3.pack(side=LEFT, padx=5)
+#            t_label4.pack(side=LEFT, padx=5)
+#            t_label5.pack(side=LEFT, padx=5)
+#            t_label6.pack(side=LEFT, padx=10)
+#            t_label7.pack(side=LEFT, padx=5)
+#            t_label8.pack(side=LEFT, padx=5, pady=5)
 
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
