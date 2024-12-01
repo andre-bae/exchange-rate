@@ -120,16 +120,28 @@ f5.pack(anchor=NW, padx=10)
 valutes = ["Криптовалюта", "Фиатная валюта"]
 s_val = valutes[0]
 selected_val = StringVar(value=valutes[0])
+gran = 6
 
-# header = ttk.Label(text=f"Выбран {s_val}")
 
-# header.grid(row=0, column=0, padx=10, pady=10, sticky=EW)
+def update_combobox():
+    global cr_var
+    if s_val == valutes[0]:
+        crypta1 = dict(list(crypta.items())[:gran])
+    else:
+        crypta1 = dict(list(crypta.items())[gran:])
+    combobox_crypta['values'] = list(crypta1.keys())
+    cr = list(crypta1.keys())
+    cr_var = StringVar(value=cr[0])
+    combobox_crypta['textvariable'] = cr_var
+
+
+    # Продолжаем обновление каждые 500 мс
+    window.after(500, update_combobox)
 
 
 def select():
     global s_val
     s_val = selected_val.get()
-#    header.config(text=f"Выбран {s_val}")
 
 i = 0
 for val in valutes:
@@ -164,7 +176,11 @@ crypta = {
     "Узбекский сум": "UZS"
 }
 
-cr = list(crypta.keys())
+if s_val==valutes[0]:
+    crypta1 = dict(list(crypta.items())[:gran])
+else:
+    crypta1 = dict(list(crypta.items())[gran:])
+cr = list(crypta1.keys())
 cr_var = StringVar(value=cr[0])
 
 combobox_crypta = ttk.Combobox(f1, textvariable=cr_var,
@@ -200,5 +216,7 @@ t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold",
                      foreground='Red', background='White', borderwidth=1, relief=SOLID)
 t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
 t_label8 = ttk.Label(f5, text='')
+
+update_combobox()
 
 window.mainloop()
