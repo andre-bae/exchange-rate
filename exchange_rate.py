@@ -133,7 +133,8 @@ def update_combobox():
     cr = list(crypta1.keys())
     cr_var = StringVar(value=cr[0])
     combobox_crypta['textvariable'] = cr_var
-
+    combobox_crypta['values'] = cr
+    crypt_label['text'] = s_val
 
     # Продолжаем обновление каждые 500 мс
     window.after(500, update_combobox)
@@ -142,6 +143,7 @@ def update_combobox():
 def select():
     global s_val
     s_val = selected_val.get()
+    crypt_label
 
 i = 0
 for val in valutes:
@@ -150,9 +152,8 @@ for val in valutes:
     lang_btn.grid(row=i+1, column=0, padx=10, pady=5, sticky=EW)
 
 # Выбор криптовалюты
-crypt_label = ttk.Label(f1, text='Базовая валюта:')
+crypt_label = ttk.Label(f1)
 crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
-
 crypta = {
     "Bitcoin": "btc",
     "Ethereum": "eth",
@@ -175,31 +176,19 @@ crypta = {
     "Казахстанский тенге": "KZT",
     "Узбекский сум": "UZS"
 }
-
-if s_val==valutes[0]:
-    crypta1 = dict(list(crypta.items())[:gran])
-else:
-    crypta1 = dict(list(crypta.items())[gran:])
-cr = list(crypta1.keys())
-cr_var = StringVar(value=cr[0])
-
-combobox_crypta = ttk.Combobox(f1, textvariable=cr_var,
-                               values=cr, state="readonly", width=28, height=20)
+combobox_crypta = ttk.Combobox(f1, state="readonly", width=28, height=20)
 combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
 
 # Выбор фиатной валюты
 fiat_label = ttk.Label(f1, text='Целевая валюта:')
 fiat_label.grid(row=1, column=0, padx=10, pady=10, sticky=EW)
-
 fiat = {
     "USD": "Долларов США",
     "Rub": "Рублей",
     "EUR": "Евро"
 }
-
 fi = list(fiat.keys())
 fi_var = StringVar(value=fi[1])
-
 combobox_fiat = ttk.Combobox(f1, textvariable=fi_var, values=fi, state="readonly")
 combobox_fiat.grid(row=1, column=1, padx=10, pady=10, sticky=EW)
 
