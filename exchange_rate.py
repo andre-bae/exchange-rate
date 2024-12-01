@@ -5,7 +5,7 @@ import requests
 from datetime import datetime as dt
 
 
-# Функция выбора базовой валюты: крипта или фиатная
+# Функция выбора базовой валюты: крипта или фиатная валюта
 def choice():
     if ord(combobox_crypta.get()[0]) < 1000:
         get_price()
@@ -28,7 +28,7 @@ def label_config(coin, price, name, time):
     t_label5.pack(side=LEFT, padx=5)
     t_label6.pack(side=LEFT, padx=10)
     t_label7.pack(side=LEFT, padx=5)
-
+    t_label8.pack(side=LEFT, padx=5)
 
 # Функция для получения цены фиатной валюты
 def exchange():
@@ -103,7 +103,7 @@ window = Tk()
 window.resizable(False, False)
 window.attributes("-toolwindow", True)
 window.title("Курсы валют")
-window.geometry("420x300")
+window.geometry("420x250")
 
 f1 = Frame(window, borderwidth=1, relief=SOLID)
 f1.pack(padx=10)
