@@ -42,6 +42,7 @@ def exchange():
             response = requests.get(f'https://open.er-api.com/v6/latest/{base_code}')
             response.raise_for_status()
             data = response.json()
+            print(data)
             update_time = data['time_last_update_unix']
             if target_code in data['rates']:
                 exchange_rate = data['rates'][target_code]
@@ -103,7 +104,7 @@ window = Tk()
 window.resizable(False, False)
 window.attributes("-toolwindow", True)
 window.title("Курсы валют")
-window.geometry("420x250")
+window.geometry("420x300")
 
 f1 = Frame(window, borderwidth=1, relief=SOLID)
 f1.pack(padx=10)
@@ -120,7 +121,7 @@ f5.pack(anchor=NW, padx=10)
 valutes = ["Криптовалюта", "Фиатная валюта"]
 s_val = valutes[0]
 selected_val = StringVar(value=valutes[0])
-gran = 6
+gran = 8
 
 
 def update_combobox():
@@ -129,9 +130,8 @@ def update_combobox():
         crypta1 = dict(list(crypta.items())[:gran])
     else:
         crypta1 = dict(list(crypta.items())[gran:])
-    combobox_crypta['values'] = list(crypta1.keys())
     cr = list(crypta1.keys())
-    cr_var = StringVar(value=cr[0])
+#    cr_var = StringVar()
     combobox_crypta['textvariable'] = cr_var
     combobox_crypta['values'] = cr
     crypt_label['text'] = s_val
@@ -157,10 +157,12 @@ crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
 crypta = {
     "Bitcoin": "btc",
     "Ethereum": "eth",
-    "Tether": "USDT",
-    "solana": "sol",
+    "Tether": "usdt",
+    "Solana": "sol",
+    "Ripple": "xrp",
     "Dogecoin": "doge",
     "Cardano": "ada",
+    "Stellar": "xlm",
     "Американский доллар": "USD",
     "Евро": "EUR",
     "Британский фунт стерлингов": "GBP",
@@ -176,7 +178,18 @@ crypta = {
     "Казахстанский тенге": "KZT",
     "Узбекский сум": "UZS"
 }
-combobox_crypta = ttk.Combobox(f1, state="readonly", width=28, height=20)
+if s_val == valutes[0]:
+    crypta1 = dict(list(crypta.items())[:gran])
+    cr = list(crypta1.keys())
+    cr_var = StringVar(value=cr[0])
+else:
+    crypta1 = dict(list(crypta.items())[gran:])
+    cr = list(crypta1.keys())
+    cr_var = StringVar(value=cr[13])
+# combobox_crypta['values'] = list(crypta1.keys())
+
+
+combobox_crypta = ttk.Combobox(f1, textvariable = cr_var, values = cr, state="readonly", width=28, height=20)
 combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
 
 # Выбор фиатной валюты

@@ -1,5 +1,22 @@
 
 
+crypta_all = {
+    "Bitcoin": "btc",
+    "Ethereum": "eth",
+    "Tether": "usdt",
+    "Solana": "sol",
+#    "Binance Coin": "bnb",
+    "Ripple": "xrp",
+    "Dogecoin": "doge",
+    "Cardano": "ada",
+#    "USDC": "usdc",
+#    "EOS": "eos",
+#    "Litecoin": "ltc",
+#    "Stablecoin": "stable",
+    "Stellar": "xlm"
+}
+
+
 fiat_all = {
     "Дирхам ОАЭ": "AED",
     "Афганский афгани": "AFN",
