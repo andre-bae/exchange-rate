@@ -116,6 +116,27 @@ f4.pack(anchor=NW, padx=10, pady=5)
 f5 = Frame(window)
 f5.pack(anchor=NW, padx=10)
 
+# Выбор фиатная или крипто- валюта
+valutes = ["Криптовалюта", "Фиатная валюта"]
+s_val = valutes[0]
+selected_val = StringVar(value=valutes[0])
+
+# header = ttk.Label(text=f"Выбран {s_val}")
+
+# header.grid(row=0, column=0, padx=10, pady=10, sticky=EW)
+
+
+def select():
+    global s_val
+    s_val = selected_val.get()
+#    header.config(text=f"Выбран {s_val}")
+
+i = 0
+for val in valutes:
+    lang_btn = ttk.Radiobutton(f1, text=val, value=val, variable=selected_val, command=select)
+    i += 1
+    lang_btn.grid(row=i+1, column=0, padx=10, pady=5, sticky=EW)
+
 # Выбор криптовалюты
 crypt_label = ttk.Label(f1, text='Базовая валюта:')
 crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
