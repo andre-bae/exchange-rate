@@ -199,11 +199,21 @@ def add_fiat():
 #    print(dict2)
 
 
+# удаление выделенного элемента
+def delete():
+    s = fiat_listbox.curselection()
+    if len(s) == 1:
+        list_fiat.pop(s[0])
+        fiat_var.set(list_fiat)
+        print(list_fiat)
+
 wind_select = Tk()
 wind_select.title("METANIT.COM")
-wind_select.geometry("600x250")
+wind_select.geometry("630x250")
 
 ttk.Button(text="Добавить", command=add_fiat).grid(row=0, column=1, padx=6, pady=6)
+
+ttk.Button(text="Удалить", command=delete).grid(row=0, column=3, padx=5, pady=5)
 
 fiat_all_var = Variable(value=list_fiat_all)
 fiat_all_listbox = Listbox(listvariable=fiat_all_var, width=35)
