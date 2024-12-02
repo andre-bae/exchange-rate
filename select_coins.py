@@ -207,6 +207,11 @@ def delete():
         fiat_var.set(list_fiat)
 
 
+# очистка списка выбранных валют
+def del_all():
+    list_fiat.clear()
+    fiat_var.set(list_fiat)
+
 
 def up_step():
     s = fiat_listbox.curselection()
@@ -239,12 +244,14 @@ ttk.Button(text="▲", command=up_step).grid(row=1, column=3, padx=5, pady=5)
 
 ttk.Button(text="▼", command=down_step).grid(row=2, column=3, padx=5, pady=5)
 
+ttk.Button(text="Очистить", command=del_all).grid(row=3, column=3, padx=5, pady=5)
+
 fiat_all_var = Variable(value=list_fiat_all)
 fiat_all_listbox = Listbox(listvariable=fiat_all_var, width=35)
-fiat_all_listbox.grid(row=0, column=0, sticky=EW, padx=5, pady=5)
+fiat_all_listbox.grid(row=0, column=0, rowspan=4, sticky=EW, padx=5, pady=5)
 
 fiat_var = Variable(value=list_fiat)
 fiat_listbox = Listbox(listvariable=fiat_var, width=35, selectmode="single")
-fiat_listbox.grid(row=0, column=2, sticky=EW, padx=5, pady=5)
+fiat_listbox.grid(row=0, column=2, rowspan=4, sticky=EW, padx=5, pady=5)
 
 wind_select.mainloop()
