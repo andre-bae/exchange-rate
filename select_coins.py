@@ -1,6 +1,7 @@
+from tkinter import *
+from tkinter import ttk
 
-
-crypta_all = {
+dict_crypta_all = {
     "Bitcoin": "btc",
     "Ethereum": "eth",
     "Tether": "usdt",
@@ -16,8 +17,7 @@ crypta_all = {
     "Stellar": "xlm"
 }
 
-
-fiat_all = {
+dict_fiat_all = {
     "Дирхам ОАЭ": "AED",
     "Афганский афгани": "AFN",
     "Албанский лек": "ALL",
@@ -180,3 +180,37 @@ fiat_all = {
     "Замбийская квача": "ZMW",
     "Зимбабвийский доллар": "ZWL"
 }
+list_fiat_all = list(dict_fiat_all)
+list_crypta_all = list(dict_crypta_all)
+list_fiat = []
+list_crypta = []
+
+
+# добавление нового элемента
+def add_fiat():
+    s = fiat_all_listbox.curselection()
+    new_fiat = list_fiat_all[s[0]]
+    if new_fiat not in list_fiat:
+        list_fiat.append(new_fiat)
+        fiat_var.set(list_fiat)
+        print(list_fiat)
+#    print(selection, list1[selection[0]], dict1_all[list1[selection[0]]])
+#    dict2[list1[selection[0]]] = dict1_all[list1[selection[0]]]
+#    print(dict2)
+
+
+wind_select = Tk()
+wind_select.title("METANIT.COM")
+wind_select.geometry("600x250")
+
+ttk.Button(text="Добавить", command=add_fiat).grid(row=0, column=1, padx=6, pady=6)
+
+fiat_all_var = Variable(value=list_fiat_all)
+fiat_all_listbox = Listbox(listvariable=fiat_all_var, width=35)
+fiat_all_listbox.grid(row=0, column=0, sticky=EW, padx=5, pady=5)
+
+fiat_var = Variable(value=list_fiat)
+fiat_listbox = Listbox(listvariable=fiat_var, width=35)
+fiat_listbox.grid(row=0, column=2, sticky=EW, padx=5, pady=5)
+
+wind_select.mainloop()
