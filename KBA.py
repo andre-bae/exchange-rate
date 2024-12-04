@@ -54,6 +54,7 @@ def label_config(coin, price, name, time):
     t_label7.pack(side=LEFT, padx=5)
     t_label8.pack(side=LEFT, padx=5)
 
+
 # Функция для получения цены фиатной валюты
 def exchange():
     target_name = combobox_target.get()
@@ -66,7 +67,7 @@ def exchange():
             response = requests.get(f'https://open.er-api.com/v6/latest/{base_code}')
             response.raise_for_status()
             data = response.json()
-            print(data)
+#            print(data)
             update_time = data['time_last_update_unix']
             if target_code in data['rates']:
                 exchange_rate = data['rates'][target_code]
@@ -111,10 +112,10 @@ def get_price():
             # Добавление пробелов в многозначное число
             len1 = len(crypt_price)
             if len1 >6:
-                i = 6
-                while i <= len1:
-                    crypt_price = crypt_price[:-i] + ' ' + crypt_price[-i:]
-                    i +=4
+                ii = 6
+                while ii <= len1:
+                    crypt_price = crypt_price[:-ii] + ' ' + crypt_price[-ii:]
+                    ii +=4
             label_config(cr_coin, crypt_price, target_name, update_time)
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
@@ -147,39 +148,19 @@ s_val = valutes[0]
 selected_val = StringVar(value=valutes[0])
 
 
-# def update_combobox():
-#     global cr_var
-#     if s_val == valutes[0]:
-#         crypta1 = dict(list(crypta.items())[:gran])
-#     else:
-#         crypta1 = dict(list(crypta.items())[gran:])
-#     cr = list(crypta1.keys())
-# #    cr_var = StringVar()
-#     combobox_crypta['textvariable'] = cr_var
-#     combobox_crypta['values'] = cr
-#     crypt_label['text'] = s_val
-#
-#     # Продолжаем обновление каждые 500 мс
-#     window.after(500, update_combobox)
-
-
 def select():
     global s_val
     s_val = selected_val.get()
-    print(s_val)
     if s_val == valutes[0]:
         fiat_label.grid_forget()
         combobox_fiat.grid_forget()
-#        crypt_label['text'] = s_val
         crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
         combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
     else:
         crypt_label.grid_forget()
         combobox_crypta.grid_forget()
-#        fiat_label['text'] = s_val
         fiat_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
         combobox_fiat.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
-
 
 i = 0
 for val in valutes:
@@ -210,8 +191,6 @@ fiat = {
 fiat1 = dict(list(fiat.items())[:])
 fi = list(fiat1.keys())
 fi_var = StringVar(value=fi[0])
-# combobox_fiat['values'] = list(fiat1.keys())
-
 
 combobox_fiat = ttk.Combobox(f1, textvariable = fi_var, values = fi,
                              state="readonly", width=28, height=20)
@@ -235,9 +214,6 @@ crypta = {
 crypta1 = dict(list(crypta.items())[:])
 cr = list(crypta1.keys())
 cr_var = StringVar(value=cr[0])
-
-# combobox_crypta['values'] = list(crypta1.keys())
-
 
 combobox_crypta = ttk.Combobox(f1, textvariable = cr_var, values = cr,
                                state="readonly", width=28, height=20)
@@ -269,7 +245,5 @@ t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold",
                      foreground='Red', background='White', borderwidth=1, relief=SOLID)
 t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
 t_label8 = ttk.Label(f5, text='')
-
-# update_combobox()
 
 window.mainloop()
