@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox as mb
+from PIL import Image, ImageTk
 import requests
 from datetime import datetime as dt
 
@@ -192,7 +193,7 @@ tg_var = StringVar(value=tg[1])
 combobox_target = ttk.Combobox(f1, textvariable=tg_var, values=tg, state="readonly")
 combobox_target.grid(row=1, column=1, padx=10, pady=10, sticky=EW)
 
-
+msg_id = 0
 # ----------------------------Выбор фиатная или крипто-валюта-----------------------
 def select():
      global s_val
@@ -217,6 +218,10 @@ enabled_checkbutton.grid(row=2, column=0, padx=10, pady=5, sticky=EW)
 
 # Функция выбора базовой валюты: крипта или фиатная валюта
 def choice():
+#    canvas.delete(img_id)
+#    canvas.destroy()
+#    label_image.config(image=None)
+    label_image.pack_forget() # destroy()
     if s_val:
         get_price()
     else:
@@ -234,5 +239,21 @@ t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold",
                      foreground='Red', background='White', borderwidth=1, relief=SOLID)
 t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
 t_label8 = ttk.Label(f5, text='')
+
+# Загрузка изображения
+# canvas = Canvas(window, bg="white", width=420, height=150)
+# canvas.pack(anchor=CENTER, expand=1)
+
+img = Image.open("frog2.jpg")
+img = img.resize((150, 150))
+img_tk = ImageTk.PhotoImage(img)
+
+# Создание Label с изображением
+label_image = Label(window, image=img_tk)
+label_image.pack() # grid(row=2, column=1, padx=10, pady=10, sticky=EW)
+
+# img_id = canvas.create_image(0, 0, anchor=NW, image=img_tk)
+# print(img_id)
+# canvas.image = image_tk
 
 window.mainloop()
