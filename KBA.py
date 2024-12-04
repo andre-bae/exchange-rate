@@ -6,6 +6,7 @@ from datetime import datetime as dt
 
 
 s_val = 0
+
 class FIAT:
     def __init__(self, country, cod, text):
         self.country = country
@@ -141,29 +142,8 @@ f5 = Frame(window)
 f5.pack(anchor=NW, padx=10)
 
 
-# Выбор фиатная или крипто-валюта
-def select():
-     global s_val
-     if check_crypta.get() == 1:
-        s_val = 1
-        fiat_label.grid_forget()
-        combobox_fiat.grid_forget()
-        crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
-        combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
-     else:
-        s_val = 0
-        crypt_label.grid_forget()
-        combobox_crypta.grid_forget()
-        fiat_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
-        combobox_fiat.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
+# ------------------------------Выбор криптовалюты------------------------------
 
-check_crypta = IntVar()
-
-enabled_checkbutton = ttk.Checkbutton(f1, text="КриптоВАлюта", variable=check_crypta, command=select)
-enabled_checkbutton.grid(row=2, column=0, padx=10, pady=5, sticky=EW)
-
-
-# Выбор криптовалюты
 crypt_label = ttk.Label(f1, text="КриптоВАлюта")
 # crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
 crypta = {
@@ -186,7 +166,8 @@ combobox_crypta = ttk.Combobox(f1, textvariable = cr_var, values = cr,
 combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
 
 
-# Выбор фиатной валюты
+# ---------------------------Выбор фиатной валюты-------------------------------
+
 fiat_label = ttk.Label(f1, text="Валюта")
 fiat_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
 fi = list(map(lambda p: p.country, list_fiat))
@@ -197,7 +178,8 @@ combobox_fiat = ttk.Combobox(f1, textvariable = fi_var, values = fi,
 combobox_fiat.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
 
 
-# Выбор целевой валюты
+# ----------------Выбор целевой валюты---------------------------------------
+
 target_label = ttk.Label(f1, text='К ВАлюте:')
 target_label.grid(row=1, column=0, padx=10, pady=10, sticky=EW)
 target = {
@@ -209,6 +191,28 @@ tg = list(target.keys())
 tg_var = StringVar(value=tg[1])
 combobox_target = ttk.Combobox(f1, textvariable=tg_var, values=tg, state="readonly")
 combobox_target.grid(row=1, column=1, padx=10, pady=10, sticky=EW)
+
+
+# ----------------------------Выбор фиатная или крипто-валюта-----------------------
+def select():
+     global s_val
+     if check_crypta.get() == 1:
+        s_val = 1
+        fiat_label.grid_forget()
+        combobox_fiat.grid_forget()
+        crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
+        combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
+     else:
+        s_val = 0
+        crypt_label.grid_forget()
+        combobox_crypta.grid_forget()
+        fiat_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
+        combobox_fiat.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
+
+check_crypta = IntVar()
+
+enabled_checkbutton = ttk.Checkbutton(f1, text="КриптоВАлюта", variable=check_crypta, command=select)
+enabled_checkbutton.grid(row=2, column=0, padx=10, pady=5, sticky=EW)
 
 
 # Функция выбора базовой валюты: крипта или фиатная валюта
