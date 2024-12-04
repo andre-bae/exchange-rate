@@ -206,12 +206,12 @@ def select():
         s_val = 0
         crypt_label.grid_forget()
         combobox_crypta.grid_forget()
-        fiat_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
-        combobox_fiat.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
+        fiat_label.grid(row=0, column=0, padx=10, pady=5, sticky=E)
+        combobox_fiat.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
 
 
 check_crypta = IntVar()
-enabled_checkbutton = ttk.Checkbutton(f1, text="КриптоВАлюта", variable=check_crypta, command=select)
+enabled_checkbutton = Checkbutton(f1, text="КриптоВАлюта", variable=check_crypta, command=select)
 enabled_checkbutton.grid(row=2, column=0, padx=10, pady=5, sticky=EW)
 
 
