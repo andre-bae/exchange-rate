@@ -6,26 +6,26 @@ from datetime import datetime as dt
 
 
 class FIAT:
-    def __init__(self, country, id_fiat, text):
+    def __init__(self, country, cod, text):
         self.country = country
-        self.id = id_fiat
+        self.cod = cod
         self.text = text
 
 list_fiat = [
-    FIAT("США", "USD", "Американский доллар"),
-    FIAT("Евросоюза", "EUR", "Евро"),
-    FIAT("Великобритании", "GBP", "Британский фунт стерлингов"),
-    FIAT("Японии", "JPY", "Японская йена"),
-    FIAT("Китая", "CNY", "Китайский юань"),
-    FIAT("России", "RUB", "Российский рубль"),
-    FIAT("Украины", "UAH", "Украинская гривна"),
-    FIAT("Тайланда", "THB", "Тайский бат"),
-    FIAT("Турции", "TRY", "Турецкая лира"),
-    FIAT("Египта", "EGP", "Египетский фунт"),
-    FIAT("Канады", "CAD", "Канадский доллар"),
-    FIAT("Швейцарии", "CHF", "Швейцарский франк"),
-    FIAT("Казахстана", "KZT", "Казахстанский тенге"),
-    FIAT("Узбекистана", "UZS", "Узбекский сум")
+    FIAT("США", "USD", "американского доллара"),
+    FIAT("Евросоюза", "EUR", "евро"),
+    FIAT("Великобритании", "GBP", "британского фунта стерлингов"),
+    FIAT("Японии", "JPY", "японской йены"),
+    FIAT("Китая", "CNY", "китайского юаня"),
+    FIAT("России", "RUB", "российского рубля"),
+    FIAT("Украины", "UAH", "украинской гривны"),
+    FIAT("Тайланда", "THB", "тайского бата"),
+    FIAT("Турции", "TRY", "турецкой лиры"),
+    FIAT("Египта", "EGP", "египетского фунта"),
+    FIAT("Канады", "CAD", "канадского доллара"),
+    FIAT("Швейцарии", "CHF", "швейцарского франка"),
+    FIAT("Казахстана", "KZT", "казахстанского тенге"),
+    FIAT("Узбекистана", "UZS", "узбекского сума")
 ]
 
 
@@ -60,7 +60,15 @@ def exchange():
     target_name = combobox_target.get()
     target_code = target_name.upper()
     fi_coin = combobox_fiat.get()
-    base_code = fiat[fi_coin].upper()
+
+#    base_code = fiat[fi_coin].upper()
+#    print(base_code)
+#    pp = filter(lambda pp: pp.country == fi_coin, list_fiat)
+#    base_code = pp.text
+    for ruyt in list_fiat:
+        if ruyt.country == fi_coin:
+            base_code = ruyt.cod.upper()
+            coin_name = ruyt.text
 
     if target_code and base_code:
         try:
@@ -72,7 +80,7 @@ def exchange():
             if target_code in data['rates']:
                 exchange_rate = data['rates'][target_code]
                 fiat_price = f"{exchange_rate}"
-                label_config(fi_coin, fiat_price, target_name, update_time)
+                label_config(coin_name, fiat_price, target_name, update_time)
             else:
                 mb.showerror("Ошибка", f"Валюта {target_code} не найдена")
         except Exception as e:
@@ -189,7 +197,9 @@ fiat = {
 }
 
 fiat1 = dict(list(fiat.items())[:])
-fi = list(fiat1.keys())
+# fi = list(fiat1.keys())
+fi = list(map(lambda p: p.country, list_fiat))
+# print(fi)
 fi_var = StringVar(value=fi[0])
 
 combobox_fiat = ttk.Combobox(f1, textvariable = fi_var, values = fi,
