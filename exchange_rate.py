@@ -117,7 +117,7 @@ f4.pack(anchor=NW, padx=10, pady=5)
 f5 = Frame(window)
 f5.pack(anchor=NW, padx=10)
 
-# Выбор фиатная или крипто- валюта
+# Выбор фиатная или крипто-валюта
 valutes = ["Криптовалюта", "Фиатная валюта"]
 s_val = valutes[0]
 selected_val = StringVar(value=valutes[0])
@@ -143,7 +143,7 @@ def update_combobox():
 def select():
     global s_val
     s_val = selected_val.get()
-    crypt_label
+#    crypt_label
 
 i = 0
 for val in valutes:
