@@ -146,7 +146,7 @@ f5.pack(anchor=NW, padx=10)
 # ------------------------------Выбор криптовалюты------------------------------
 
 crypt_label = ttk.Label(f1, text="КриптоВАлюта")
-# crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
+# crypt_label.grid(row=0, column=0, padx=10, pady=5, sticky=E)
 crypta = {
     "Bitcoin": "btc",
     "Ethereum": "eth",
@@ -164,25 +164,25 @@ cr_var = StringVar(value=cr[0])
 
 combobox_crypta = ttk.Combobox(f1, textvariable = cr_var, values = cr,
                                state="readonly", width=28, height=20)
-combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
+combobox_crypta.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
 
 
 # ---------------------------Выбор фиатной валюты-------------------------------
 
 fiat_label = ttk.Label(f1, text="Валюта")
-fiat_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
+fiat_label.grid(row=0, column=0, padx=10, pady=5, sticky=E)
 fi = list(map(lambda p: p.country, list_fiat))
 fi_var = StringVar(value=fi[0])
 
 combobox_fiat = ttk.Combobox(f1, textvariable = fi_var, values = fi,
                              state="readonly", width=28, height=20)
-combobox_fiat.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
+combobox_fiat.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
 
 
 # ----------------Выбор целевой валюты---------------------------------------
 
 target_label = ttk.Label(f1, text='К ВАлюте:')
-target_label.grid(row=1, column=0, padx=10, pady=10, sticky=EW)
+target_label.grid(row=1, column=0, padx=10, pady=5, sticky=E)
 target = {
     "USD": "Долларов США",
     "Rub": "Рублей",
@@ -191,7 +191,7 @@ target = {
 tg = list(target.keys())
 tg_var = StringVar(value=tg[1])
 combobox_target = ttk.Combobox(f1, textvariable=tg_var, values=tg, state="readonly")
-combobox_target.grid(row=1, column=1, padx=10, pady=10, sticky=EW)
+combobox_target.grid(row=1, column=1, padx=10, pady=5, sticky=EW)
 
 msg_id = 0
 # ----------------------------Выбор фиатная или крипто-валюта-----------------------
@@ -201,8 +201,8 @@ def select():
         s_val = 1
         fiat_label.grid_forget()
         combobox_fiat.grid_forget()
-        crypt_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
-        combobox_crypta.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
+        crypt_label.grid(row=0, column=0, padx=10, pady=5, sticky=E)
+        combobox_crypta.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
      else:
         s_val = 0
         crypt_label.grid_forget()
@@ -218,17 +218,21 @@ enabled_checkbutton.grid(row=2, column=0, padx=10, pady=5, sticky=EW)
 
 # Функция выбора базовой валюты: крипта или фиатная валюта
 def choice():
-#    canvas.delete(img_id)
-#    canvas.destroy()
-#    label_image.config(image=None)
-    label_image.pack_forget() # destroy()
+    label_frog.pack_forget()
+    label_kva.pack_forget()
     if s_val:
         get_price()
     else:
         exchange()
 
 # Получение курса
-Button(f1, text="КВА", command=choice).grid(row=2, column=1, padx=10, pady=10, sticky=EW)
+# image_path = "btn.gif"
+
+button_kva_img = Image.open("btn_kva.gif")
+# button_kva_img = button_kva_img.resize((104, 36))
+button_kva_img_tk = ImageTk.PhotoImage(button_kva_img)
+
+Button(f1, image=button_kva_img_tk, command=choice, relief='flat', borderwidth=0).grid(row=2, column=1, padx=10, sticky=E)
 
 t_label1 = ttk.Label(f2, text='На ', font="Helvetica 10")
 t_label2 = ttk.Label(f2, text='', font="Helvetica 10 bold")
@@ -244,16 +248,16 @@ t_label8 = ttk.Label(f5, text='')
 # canvas = Canvas(window, bg="white", width=420, height=150)
 # canvas.pack(anchor=CENTER, expand=1)
 
-img = Image.open("frog2.jpg")
-img = img.resize((150, 150))
-img_tk = ImageTk.PhotoImage(img)
+frog = Image.open("frog2.gif")
+frog = frog.resize((150, 150))
+frog_tk = ImageTk.PhotoImage(frog)
+label_frog = Label(window, image=frog_tk)
+label_frog.pack(side=RIGHT)
 
-# Создание Label с изображением
-label_image = Label(window, image=img_tk)
-label_image.pack() # grid(row=2, column=1, padx=10, pady=10, sticky=EW)
-
-# img_id = canvas.create_image(0, 0, anchor=NW, image=img_tk)
-# print(img_id)
-# canvas.image = image_tk
+kva = Image.open("kva2.gif")
+# kva = frog.resize((150, 150))
+kva_tk = ImageTk.PhotoImage(kva)
+label_kva = Label(window, image=kva_tk)
+label_kva.pack(side=LEFT)
 
 window.mainloop()
