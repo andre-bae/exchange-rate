@@ -32,7 +32,8 @@ list_fiat = [
 ]
 
 
-# Функция оформления вывода результата в метки
+# --------------------Функция оформления вывода результата в метки------------------------
+
 def label_config(coin, price, name, time):
     t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
     t_label4.config(text=f"{coin}")
@@ -50,17 +51,18 @@ def label_config(coin, price, name, time):
     t_label8.pack(side=LEFT, padx=5)
 
 
-# Функция для получения цены фиатной валюты
+# ---------------------------Функция для получения цены фиатной валюты----------------------
+
 def exchange():
     target_name = combobox_target.get()
     target_code = target_name.upper()
     fi_coin = combobox_fiat.get()
     base_code = ''
     coin_name = ''
-    for ruyt in list_fiat:
-        if ruyt.country == fi_coin:
-            base_code = ruyt.cod.upper()
-            coin_name = ruyt.text
+    for fit in list_fiat:
+        if fit.country == fi_coin:
+            base_code = fit.cod.upper()
+            coin_name = fit.text
 
     if target_code and base_code:
         try:
@@ -81,7 +83,8 @@ def exchange():
         mb.showwarning("Внимание", "Выберите коды валют")
 
 
-# Функция для получения цены криптовалюты
+# ------------------------------Функция для получения цены криптовалюты----------------------
+
 def get_price():
     cr_coin = combobox_crypta.get()
     ids = cr_coin.lower()
@@ -122,6 +125,7 @@ def get_price():
     except requests.exceptions.RequestException as e:
         mb.showerror("Ошибка", f"Произошла ошибка при выполнении запроса: {e}")
 
+
 # ---------------------Создание графического интерфейса----------------------
 
 window = Tk()
@@ -141,7 +145,6 @@ f4 = Frame(window)
 f4.pack(anchor=NW, padx=10, pady=5)
 f5 = Frame(window)
 f5.pack(anchor=NW, padx=10)
-
 
 # ------------------------------Выбор криптовалюты------------------------------
 
@@ -166,7 +169,6 @@ combobox_crypta = ttk.Combobox(f1, textvariable = cr_var, values = cr,
                                state="readonly", width=28, height=20)
 combobox_crypta.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
 
-
 # ---------------------------Выбор фиатной валюты-------------------------------
 
 fiat_label = ttk.Label(f1, text="Валюта")
@@ -177,7 +179,6 @@ fi_var = StringVar(value=fi[0])
 combobox_fiat = ttk.Combobox(f1, textvariable = fi_var, values = fi,
                              state="readonly", width=28, height=20)
 combobox_fiat.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
-
 
 # ----------------Выбор целевой валюты---------------------------------------
 
@@ -193,8 +194,9 @@ tg_var = StringVar(value=tg[1])
 combobox_target = ttk.Combobox(f1, textvariable=tg_var, values=tg, state="readonly")
 combobox_target.grid(row=1, column=1, padx=10, pady=5, sticky=EW)
 
-msg_id = 0
-# ----------------------------Выбор фиатная или крипто-валюта-----------------------
+
+# ----------------------------Чекбокс выбора фиатная или крипто-валюта-----------------------
+
 def select():
      global s_val
      if check_crypta.get() == 1:
@@ -210,13 +212,14 @@ def select():
         fiat_label.grid(row=0, column=0, padx=10, pady=10, sticky=E)
         combobox_fiat.grid(row=0, column=1, padx=10, pady=10, sticky=EW)
 
-check_crypta = IntVar()
 
+check_crypta = IntVar()
 enabled_checkbutton = ttk.Checkbutton(f1, text="КриптоВАлюта", variable=check_crypta, command=select)
 enabled_checkbutton.grid(row=2, column=0, padx=10, pady=5, sticky=EW)
 
 
-# Функция выбора базовой валюты: крипта или фиатная валюта
+# ----------------------Получение курса базовой валюты: крипта или фиатная валюта-----------------
+
 def choice():
     label_frog.pack_forget()
     label_kva.pack_forget()
@@ -225,14 +228,12 @@ def choice():
     else:
         exchange()
 
-# Получение курса
-# image_path = "btn.gif"
 
+# Кнопка получения курса
 button_kva_img = Image.open("btn_kva.gif")
-# button_kva_img = button_kva_img.resize((104, 36))
 button_kva_img_tk = ImageTk.PhotoImage(button_kva_img)
-
-Button(f1, image=button_kva_img_tk, command=choice, relief='flat', borderwidth=0).grid(row=2, column=1, padx=10, sticky=E)
+Button(f1, image=button_kva_img_tk, command=choice,
+       relief='flat', borderwidth=0).grid(row=2, column=1, padx=10, sticky=E)
 
 t_label1 = ttk.Label(f2, text='На ', font="Helvetica 10")
 t_label2 = ttk.Label(f2, text='', font="Helvetica 10 bold")
@@ -244,9 +245,7 @@ t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold",
 t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
 t_label8 = ttk.Label(f5, text='')
 
-# Загрузка изображения
-# canvas = Canvas(window, bg="white", width=420, height=150)
-# canvas.pack(anchor=CENTER, expand=1)
+# ------------------------------Загрузка лягушки------------------------------
 
 frog = Image.open("frog2.gif")
 frog = frog.resize((150, 150))
@@ -255,7 +254,6 @@ label_frog = Label(window, image=frog_tk)
 label_frog.pack(side=RIGHT)
 
 kva = Image.open("kva2.gif")
-# kva = frog.resize((150, 150))
 kva_tk = ImageTk.PhotoImage(kva)
 label_kva = Label(window, image=kva_tk)
 label_kva.pack(side=LEFT)
