@@ -233,7 +233,7 @@ def down_step():
         fiat_listbox.selection_set(s+1)
 
 wind_select = Tk()
-wind_select.title("METANIT.COM")
+wind_select.title("Выбор валют")
 wind_select.geometry("630x250")
 
 ttk.Button(text="Добавить", command=add_fiat).grid(row=0, column=1, padx=6, pady=6)

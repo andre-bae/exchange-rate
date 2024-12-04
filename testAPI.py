@@ -6,7 +6,7 @@ from datetime import datetime as dt
 import os
 
 
-# Функция для получения цены кринтовалюты
+# Функция для получения цены криптовалюты
 def get_price():
     cr_coin = combobox_crypta.get()
     ids = cr_coin.lower()
@@ -26,6 +26,7 @@ def get_price():
     try:
         # Выполнение GET-запроса
         response = requests.get(url=url, params=params, headers=headers)
+
         # Обработка ответа
         if response.status_code == 200:
             data = response.json()
@@ -34,13 +35,15 @@ def get_price():
             print("Время последнего обновления курса: ", dt.fromtimestamp(update_time).strftime('%Y-%m-%d %H:%M:%S'))
             price = data[ids][fi1]
             crypt_price = f"{price:.2f}"
-            # Добавление пробелов в многозачное число
+
+            # Добавление пробелов в многозначное число
             len1 = len(crypt_price)
             if len1 >6:
                 i = 6
                 while i <= len1:
                     crypt_price = crypt_price[:-i] + ' ' + crypt_price[-i:]
                     i +=4
+
             t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
             t_label4.config(text=f"{cr_coin}")
             t_label6.config(text=f" {crypt_price} ")
@@ -54,6 +57,7 @@ def get_price():
             t_label6.pack(side=LEFT, padx=10)
             t_label7.pack(side=LEFT, padx=5)
             t_label8.pack(side=LEFT, padx=5, pady=5)
+
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
@@ -125,4 +129,3 @@ t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
 t_label8 = ttk.Label(f5, text='')
 
 window.mainloop()
-

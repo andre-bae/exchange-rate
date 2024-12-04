@@ -59,8 +59,10 @@ window = Tk()
 window.title("Курс обмена валюты")
 window.geometry("360x300")
 
+cr = list(currencies.values())
+cr_var = StringVar(value=cr[0])
 Label(text="Базовая валюта:").pack(padx=10, pady=5)
-base_combobox = ttk.Combobox(values=list(currencies.keys()))
+base_combobox = ttk.Combobox(values=list(currencies.keys()), textvariable=cr_var)
 base_combobox.pack(padx=10, pady=5)
 base_combobox.bind("<<ComboboxSelected>>", update_b_label)
 
