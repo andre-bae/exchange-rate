@@ -4,36 +4,30 @@ from tkinter import messagebox as mb
 from PIL import Image, ImageTk
 import requests
 from datetime import datetime as dt
+import os
+import sys
 
-from select_coins import *
+# from select_coins import *
+from list_all_coins import *
+# import base64
 
+
+# записываем полные пути к файлам картинок чтобы их засунуть в один ехе файл потом
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 s_val = 0
 
 
-list_fiat = [
-    FIAT("США", "USD", "американского доллара"),
-    FIAT("Евросоюза", "EUR", "евро"),
-    FIAT("Великобритании", "GBP", "британского фунта стерлингов"),
-    FIAT("Японии", "JPY", "японской йены"),
-    FIAT("Китая", "CNY", "китайского юаня"),
-    FIAT("России", "RUB", "российского рубля"),
-    FIAT("Украины", "UAH", "украинской гривны"),
-    FIAT("Тайланда", "THB", "тайского бата"),
-    FIAT("Турции", "TRY", "турецкой лиры"),
-    FIAT("Египта", "EGP", "египетского фунта"),
-    FIAT("Канады", "CAD", "канадского доллара"),
-    FIAT("Швейцарии", "CHF", "швейцарского франка"),
-    FIAT("Казахстана", "KZT", "казахстанского тенге"),
-    FIAT("Узбекистана", "UZS", "узбекского сума")
-]
-
-
 # --------------------Функция оформления вывода результата в метки------------------------
 
-def label_config(coin, price, name, time):
+def label_config(money, price, name, time):
     t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
-    t_label4.config(text=f"{coin}")
+    t_label4.config(text=f"{money}")
     t_label6.config(text=f" {price} ")
     t_label7.config(text=f" {name}")
     t_label8.config(text=f"( Последнее обновление курса: "
@@ -56,7 +50,7 @@ def exchange():
     fi_coin = combobox_fiat.get()
     base_code = ''
     coin_name = ''
-    for fit in list_fiat:
+    for fit in list_fiat_FIAT:
         if fit.country == fi_coin:
             base_code = fit.cod.upper()
             coin_name = fit.text
@@ -126,9 +120,19 @@ def get_price():
 # ---------------------Создание графического интерфейса----------------------
 
 window = Tk()
-# window.iconbitmap('bitcoin.ico')
+'''
+# Преобразование иконки в base64
+with open(resource_path("frog2.ico"), 'rb') as image:
+    binary_icon = base64.b64encode(image.read())
+
+# Использование при запуске
+with open(resource_path("frog2.ico"), 'wb') as image:
+    image.write(base64.b64decode(binary_icon))
+# app.iconbitmap('icon.ico')
+'''
+window.iconbitmap(resource_path("frog2.ico"))
 window.resizable(False, False)
-window.attributes("-toolwindow", True)
+# window.attributes("-toolwindow", True)
 window.title("Курсы ВАлют")
 window.geometry("420x300")
 
@@ -170,7 +174,7 @@ combobox_crypta.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
 
 fiat_label = ttk.Label(f1, text="Валюта")
 fiat_label.grid(row=0, column=0, padx=10, pady=5, sticky=E)
-fi = list(map(lambda p: p.country, list_fiat))
+fi = list(map(lambda p: p.country, list_fiat_FIAT))
 fi_var = StringVar(value=fi[0])
 
 combobox_fiat = ttk.Combobox(f1, textvariable = fi_var, values = fi,
@@ -227,7 +231,7 @@ def choice():
 
 
 # Кнопка получения курса
-button_kva_img = Image.open("btn_kva.gif")
+button_kva_img = Image.open(resource_path("btn_kva.gif"))
 button_kva_img_tk = ImageTk.PhotoImage(button_kva_img)
 Button(f1, image=button_kva_img_tk, command=choice,
        relief='flat', borderwidth=0).grid(row=2, column=1, padx=10, sticky=E)
@@ -244,15 +248,130 @@ t_label8 = ttk.Label(f5, text='')
 
 # ------------------------------Загрузка лягушки------------------------------
 
-frog = Image.open("frog2.gif")
+frog = Image.open(resource_path("frog2.gif"))
 frog = frog.resize((150, 150))
 frog_tk = ImageTk.PhotoImage(frog)
 label_frog = Label(window, image=frog_tk)
 label_frog.pack(side=RIGHT)
 
-kva = Image.open("kva2.gif")
+kva = Image.open(resource_path("kva2.gif"))
 kva_tk = ImageTk.PhotoImage(kva)
 label_kva = Label(window, image=kva_tk)
 label_kva.pack(side=LEFT)
+
+
+# ----------------------------------------Настройка списка фиатных валют----------------
+
+def select_fiat_coins():
+
+    list_fiat = []
+
+    # добавление нового элемента
+    def add_fiat():
+        s = fiat_all_listbox.curselection()
+        if len(s) == 1:
+            s = s[0]
+            new_fiat = fiat_all_listbox.get(s)
+            if new_fiat not in list_fiat:
+                list_fiat.append(new_fiat)
+                fiat_var.set(list_fiat)
+
+
+    # удаление выделенного элемента
+    def delete():
+        s = fiat_listbox.curselection()
+        if len(s) == 1:
+            list_fiat.pop(s[0])
+            fiat_var.set(list_fiat)
+
+
+    # очистка списка выбранных валют
+    def del_all():
+        list_fiat.clear()
+        fiat_var.set(list_fiat)
+
+
+    def up_step():
+        s = fiat_listbox.curselection()
+        if len(s) == 1:
+            s = s[0]
+            list_fiat[s-1:s+1] = list_fiat[s-1:s+1][::-1]
+            fiat_var.set(list_fiat)
+            fiat_listbox.selection_clear(0, END)
+            fiat_listbox.selection_set(s-1)
+
+
+    def down_step():
+        s = fiat_listbox.curselection()
+        if len(s) == 1:
+            s = s[0]
+            list_fiat[s:s+2] = list_fiat[s:s+2][::-1]
+            fiat_var.set(list_fiat)
+            fiat_listbox.selection_clear(0, END)
+            fiat_listbox.selection_set(s+1)
+
+
+    def cancel_wind_select():
+        wind_select.grab_release()
+        wind_select.destroy()
+
+
+    def ok_wind_select():
+        list_fiat_FIAT.clear()
+        for fiat in list_fiat:
+            for money in list_fiat_all_FIAT:
+                if fiat == money.country:
+                    list_fiat_FIAT.append(money)
+        fi = list(map(lambda p: p.country, list_fiat_FIAT))
+        combobox_fiat['values'] = fi
+        combobox_fiat.current(0)
+        fi_var.set(combobox_fiat['values'][0])
+        cancel_wind_select()
+
+
+    wind_select = Toplevel()
+    wind_select.title("Выбор валют")
+    wind_select.geometry("630x250")
+    wind_select.protocol("WM_DELETE_WINDOW", lambda: cancel_wind_select())
+
+    ttk.Button(wind_select, text="Добавить", command=add_fiat).grid(row=0, column=1, padx=6, pady=6)
+
+    ttk.Button(wind_select, text="Удалить", command=delete).grid(row=0, column=3, padx=5, pady=5)
+
+    ttk.Button(wind_select, text="▲", command=up_step).grid(row=1, column=3, padx=5, pady=5)
+
+    ttk.Button(wind_select, text="▼", command=down_step).grid(row=2, column=3, padx=5, pady=5)
+
+    ttk.Button(wind_select, text="Очистить", command=del_all).grid(row=3, column=3, padx=5, pady=5)
+
+    ttk.Button(wind_select, text="Ok", command=ok_wind_select).grid(row=4, column=2, padx=5, pady=5)
+
+    ttk.Button(wind_select, text="Cancel", command=cancel_wind_select).grid(row=4, column=3, padx=5, pady=5)
+
+    fiat_all_var = Variable(value=list_fiat_all_country)
+    fiat_all_listbox = Listbox(wind_select, listvariable=fiat_all_var, width=35)
+    fiat_all_listbox.grid(row=0, column=0, rowspan=4, sticky=EW, padx=5, pady=5)
+
+    fiat_var = Variable(value=list_fiat)
+    fiat_listbox = Listbox(wind_select, listvariable=fiat_var, width=35, selectmode="single")
+    fiat_listbox.grid(row=0, column=2, rowspan=4, sticky=EW, padx=5, pady=5)
+
+
+
+# ----------------------------------загрузка файл-меню------------------
+
+
+def quit1():
+    window.destroy()
+
+
+menu_bar = Menu(window)
+window.config(menu=menu_bar)
+file_menu = Menu(menu_bar, tearoff=0)
+menu_bar.add_cascade(label='Файл', menu=file_menu)
+# file_menu.add_command(label='Загрузить изображение', command=load_image)
+file_menu.add_command(label='Настройка', command=select_fiat_coins)
+file_menu.add_separator()
+file_menu.add_command(label='Выход', command=quit1)
 
 window.mainloop()
