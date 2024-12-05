@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog as fd
 from tkinter import messagebox as mb
 from PIL import Image, ImageTk
 import requests
@@ -136,6 +137,7 @@ window.resizable(False, False)
 window.title("Курсы ВАлют")
 window.geometry("420x300")
 
+
 f1 = Frame(window, borderwidth=1, relief=SOLID)
 f1.pack(padx=10)
 f2 = Frame(window)
@@ -150,7 +152,7 @@ f5.pack(anchor=NW, padx=10)
 # ------------------------------Выбор криптовалюты------------------------------
 
 crypt_label = ttk.Label(f1, text="КриптоВАлюта")
-# crypt_label.grid(row=0, column=0, padx=10, pady=5, sticky=E)
+
 crypta = {
     "Bitcoin": "btc",
     "Ethereum": "eth",
@@ -265,6 +267,9 @@ label_kva.pack(side=LEFT)
 def select_fiat_coins():
 
     list_fiat = []
+    for money in list_fiat_FIAT:
+        list_fiat.append(money.country)
+
 
     # добавление нового элемента
     def add_fiat():
@@ -329,9 +334,52 @@ def select_fiat_coins():
         cancel_wind_select()
 
 
+    def load_coins():
+        try:
+            file = fd.askopenfilename(
+                defaultextension=".kva",
+                filetypes=[("KBA файлы", "*.kva"), ("Все файлы", "*.*")]
+            )
+            list_test = []
+            if file:
+                with open(file, 'r') as f:
+                    list_test.extend(f.read().split('\n'))
+            if len(list_test) > 0:
+                list_fiat.clear()
+                for fiat in list_test:
+                    for money in list_fiat_all_FIAT:
+                        if fiat == money.country:
+                            list_fiat.append(fiat)
+                fiat_var.set(list_fiat)
+        except FileNotFoundError:
+            mb.showerror("Ошибка", f"Файл {file} не найден")
+        except Exception as e:
+            mb.showerror("Ошибка", f"Произошла ошибка: {e}")
+
+
+    def save_coins():
+        try:
+            file = fd.asksaveasfilename(
+                initialfile="my_coins",  # Предлагаемое имя файла
+                defaultextension=".kva",  # Расширение по умолчанию
+                filetypes=[("KBA файлы", "*.kva"),  # Допустимые типы файлов
+                           ("Все файлы", "*.*")])
+            if file:  # Проверяем, выбран ли файл
+                with open(file, 'w') as f:
+                    f.write('\n'.join(list_fiat))
+        except FileNotFoundError:
+            mb.showerror("Ошибка", "Не удалось сохранить файл")
+        except Exception as e:
+            mb.showerror("Ошибка", f"Произошла ошибка: {e}")
+
+
+
+# ---------------------------------геометрия всплывающего окна настройки---------------
+
     wind_select = Toplevel()
     wind_select.title("Выбор валют")
     wind_select.geometry("630x250")
+    wind_select.grab_set()
     wind_select.protocol("WM_DELETE_WINDOW", lambda: cancel_wind_select())
 
     ttk.Button(wind_select, text="Добавить", command=add_fiat).grid(row=0, column=1, padx=6, pady=6)
@@ -348,9 +396,13 @@ def select_fiat_coins():
 
     ttk.Button(wind_select, text="Cancel", command=cancel_wind_select).grid(row=4, column=3, padx=5, pady=5)
 
+    ttk.Button(wind_select, text="Загрузить", command=load_coins).grid(row=5, column=2, padx=5, pady=5)
+
+    ttk.Button(wind_select, text="Сохранить", command=save_coins).grid(row=5, column=3, padx=5, pady=5)
+
     fiat_all_var = Variable(value=list_fiat_all_country)
     fiat_all_listbox = Listbox(wind_select, listvariable=fiat_all_var, width=35)
-    fiat_all_listbox.grid(row=0, column=0, rowspan=4, sticky=EW, padx=5, pady=5)
+    fiat_all_listbox.grid(row=0, column=0, rowspan=4, sticky=NS, padx=5, pady=5)
 
     fiat_var = Variable(value=list_fiat)
     fiat_listbox = Listbox(wind_select, listvariable=fiat_var, width=35, selectmode="single")
@@ -369,7 +421,6 @@ menu_bar = Menu(window)
 window.config(menu=menu_bar)
 file_menu = Menu(menu_bar, tearoff=0)
 menu_bar.add_cascade(label='Файл', menu=file_menu)
-# file_menu.add_command(label='Загрузить изображение', command=load_image)
 file_menu.add_command(label='Настройка', command=select_fiat_coins)
 file_menu.add_separator()
 file_menu.add_command(label='Выход', command=quit1)
