@@ -134,8 +134,8 @@ with open(resource_path("frog2.ico"), 'wb') as image:
 window.iconbitmap(resource_path("frog2.ico"))
 window.resizable(False, False)
 # window.attributes("-toolwindow", True)
-window.title("Курсы ВАлют")
-window.geometry("420x300")
+window.title("Актуальные Курсы ВАлют более 160 стран")
+window.geometry("450x300")
 
 
 f1 = Frame(window, borderwidth=1, relief=SOLID)
@@ -149,9 +149,10 @@ f4.pack(anchor=NW, padx=10, pady=5)
 f5 = Frame(window)
 f5.pack(anchor=NW, padx=10)
 
+
 # ------------------------------Выбор криптовалюты------------------------------
 
-crypt_label = ttk.Label(f1, text="КриптоВАлюта")
+crypt_label = ttk.Label(f1, text="КриптоВАлюта", width=14)
 
 crypta = {
     "Bitcoin": "btc",
@@ -170,23 +171,23 @@ cr_var = StringVar(value=cr[0])
 
 combobox_crypta = ttk.Combobox(f1, textvariable = cr_var, values = cr,
                                state="readonly", width=28, height=20)
-combobox_crypta.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
+combobox_crypta.grid(row=0, column=2, padx=10, pady=5, sticky=EW)
 
 # ---------------------------Выбор фиатной валюты-------------------------------
-
-fiat_label = ttk.Label(f1, text="Валюта")
-fiat_label.grid(row=0, column=0, padx=10, pady=5, sticky=E)
+f_text = "Валюта".rjust(20)
+fiat_label = ttk.Label(f1, text=f_text, width=14)
+fiat_label.grid(row=0, column=1, padx=10, pady=5, sticky=E)
 fi = list(map(lambda p: p.country, list_fiat_FIAT))
 fi_var = StringVar(value=fi[0])
 
 combobox_fiat = ttk.Combobox(f1, textvariable = fi_var, values = fi,
                              state="readonly", width=28, height=20)
-combobox_fiat.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
+combobox_fiat.grid(row=0, column=2, padx=10, pady=5, sticky=EW)
 
 # ----------------Выбор целевой валюты---------------------------------------
 
 target_label = ttk.Label(f1, text='К ВАлюте:')
-target_label.grid(row=1, column=0, padx=10, pady=5, sticky=E)
+target_label.grid(row=1, column=1, padx=10, pady=5, sticky=E)
 target = {
     "USD": "Долларов США",
     "Rub": "Рублей",
@@ -195,7 +196,7 @@ target = {
 tg = list(target.keys())
 tg_var = StringVar(value=tg[1])
 combobox_target = ttk.Combobox(f1, textvariable=tg_var, values=tg, state="readonly")
-combobox_target.grid(row=1, column=1, padx=10, pady=5, sticky=EW)
+combobox_target.grid(row=1, column=2, padx=10, pady=5, sticky=EW)
 
 
 # ----------------------------Чекбокс выбора фиатная или крипто-валюта-----------------------
@@ -206,19 +207,19 @@ def select():
         s_val = 1
         fiat_label.grid_forget()
         combobox_fiat.grid_forget()
-        crypt_label.grid(row=0, column=0, padx=10, pady=5, sticky=E)
-        combobox_crypta.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
+        crypt_label.grid(row=0, column=1, padx=10, pady=5, sticky=E)
+        combobox_crypta.grid(row=0, column=2, padx=10, pady=5, sticky=EW)
      else:
         s_val = 0
         crypt_label.grid_forget()
         combobox_crypta.grid_forget()
-        fiat_label.grid(row=0, column=0, padx=10, pady=5, sticky=E)
-        combobox_fiat.grid(row=0, column=1, padx=10, pady=5, sticky=EW)
+        fiat_label.grid(row=0, column=1, padx=10, pady=5, sticky=E)
+        combobox_fiat.grid(row=0, column=2, padx=10, pady=5, sticky=EW)
 
 
 check_crypta = IntVar()
 enabled_checkbutton = Checkbutton(f1, text="КриптоВАлюта", variable=check_crypta, command=select)
-enabled_checkbutton.grid(row=2, column=0, padx=10, pady=5, sticky=EW)
+enabled_checkbutton.grid(row=2, column=0, columnspan=2, padx=10, pady=5, sticky=EW)
 
 
 # ----------------------Получение курса базовой валюты: крипта или фиатная валюта-----------------
@@ -233,10 +234,24 @@ def choice():
 
 
 # Кнопка получения курса
-button_kva_img = Image.open(resource_path("btn_kva.gif"))
-button_kva_img_tk = ImageTk.PhotoImage(button_kva_img)
-Button(f1, image=button_kva_img_tk, command=choice,
-       relief='flat', borderwidth=0).grid(row=2, column=1, padx=10, sticky=E)
+
+
+def button_kva_enter(event):
+    global img_kva, img_hoverg_kva
+    img_hoverg_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva2.gif")))
+    button_kva.config(image=img_hoverg_kva)
+
+
+def button_kva_leave(event):
+    global img_kva, img_hoverg_kva
+    button_kva.config(image=img_kva)
+
+
+img_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva.gif")))
+button_kva = Button(f1, image=img_kva, command=choice, relief='flat', borderwidth=0)
+button_kva.grid(row=2, column=2, padx=10, sticky=E)
+button_kva.bind("<Enter>", button_kva_enter)
+button_kva.bind("<Leave>", button_kva_leave)
 
 t_label1 = ttk.Label(f2, text='На ', font="Helvetica 10")
 t_label2 = ttk.Label(f2, text='', font="Helvetica 10 bold")
@@ -409,20 +424,27 @@ def select_fiat_coins():
     fiat_listbox.grid(row=0, column=2, rowspan=4, sticky=EW, padx=5, pady=5)
 
 
+# ------------------------------------Кнопка настройки-----------------------------
 
-# ----------------------------------загрузка файл-меню------------------
+def settings_enter(event):
+    global img_settings, img_hoverg_settings
+    img_hoverg_settings = ImageTk.PhotoImage(Image.open(resource_path("settings2.gif")))
+    button_settings.config(image=img_hoverg_settings)
+
+
+def settings_leave(event):
+    global img_settings, img_hoverg_settings
+    button_settings.config(image=img_settings)
+
+
+img_settings = ImageTk.PhotoImage(Image.open(resource_path("settings.gif")))
+button_settings = Button(f1, image=img_settings, command=select_fiat_coins, relief='flat', borderwidth=0)
+button_settings.grid(row=0, column=0, padx=(0,5), sticky=E)
+button_settings.bind("<Enter>", settings_enter)
+button_settings.bind("<Leave>", settings_leave)
 
 
 def quit1():
     window.destroy()
-
-
-menu_bar = Menu(window)
-window.config(menu=menu_bar)
-file_menu = Menu(menu_bar, tearoff=0)
-menu_bar.add_cascade(label='Файл', menu=file_menu)
-file_menu.add_command(label='Настройка', command=select_fiat_coins)
-file_menu.add_separator()
-file_menu.add_command(label='Выход', command=quit1)
 
 window.mainloop()
