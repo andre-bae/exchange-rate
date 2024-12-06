@@ -120,16 +120,16 @@ def get_price():
 # ---------------------Создание графического интерфейса----------------------
 
 window = Tk()
-# '''
+
 # Преобразование иконки в base64
-with open(resource_path("frog3.ico"), 'rb') as image:
+with open(resource_path("frog2.ico"), 'rb') as image:
     binary_icon = base64.b64encode(image.read())
 
-# Использование при запуске
-with open(resource_path("frog3.ico"), 'wb') as image:
+# Использование иконки при запуске и в папке и на рабочем столе (после перезагрузки)
+with open(resource_path("frog2.ico"), 'wb') as image:
     image.write(base64.b64decode(binary_icon))
-# '''
-window.iconbitmap(resource_path("frog3.ico"))
+
+window.iconbitmap(resource_path("frog2.ico"))
 window.resizable(False, False)
 # window.attributes("-toolwindow", True)
 window.title("Актуальные Курсы ВАлют более 160 стран")
