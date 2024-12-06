@@ -7,10 +7,9 @@ import requests
 from datetime import datetime as dt
 import os
 import sys
+import base64
 
-# from select_coins import *
 from list_all_coins import *
-# import base64
 
 
 # записываем полные пути к файлам картинок чтобы их засунуть в один ехе файл потом
@@ -121,17 +120,16 @@ def get_price():
 # ---------------------Создание графического интерфейса----------------------
 
 window = Tk()
-'''
+# '''
 # Преобразование иконки в base64
-with open(resource_path("frog2.ico"), 'rb') as image:
+with open(resource_path("frog3.ico"), 'rb') as image:
     binary_icon = base64.b64encode(image.read())
 
 # Использование при запуске
-with open(resource_path("frog2.ico"), 'wb') as image:
+with open(resource_path("frog3.ico"), 'wb') as image:
     image.write(base64.b64decode(binary_icon))
-# app.iconbitmap('icon.ico')
-'''
-window.iconbitmap(resource_path("frog2.ico"))
+# '''
+window.iconbitmap(resource_path("frog3.ico"))
 window.resizable(False, False)
 # window.attributes("-toolwindow", True)
 window.title("Актуальные Курсы ВАлют более 160 стран")
@@ -265,8 +263,8 @@ t_label8 = ttk.Label(f5, text='')
 
 # ------------------------------Загрузка лягушки------------------------------
 
-frog = Image.open(resource_path("frog2.gif"))
-frog = frog.resize((150, 150))
+frog = Image.open(resource_path("frog4.gif"))
+# frog = frog.resize((150, 150))
 frog_tk = ImageTk.PhotoImage(frog)
 label_frog = Label(window, image=frog_tk)
 label_frog.pack(side=RIGHT)
