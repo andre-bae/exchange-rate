@@ -233,7 +233,6 @@ def choice():
 
 # Кнопка получения курса
 
-
 def button_kva_enter(event):
     global img_kva, img_hoverg_kva
     img_hoverg_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva2.gif")))
