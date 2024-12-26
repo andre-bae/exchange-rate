@@ -45,9 +45,6 @@ def label_config(money, price, name, time):
     t_label7.pack(side=LEFT, padx=5)
     t_label8.pack(side=LEFT, padx=5)
 
-    button_graf = Button(f2, command=get_price_graf)
-    button_graf.pack(side=RIGHT, padx=5)
-
 
 # ---------------------------Функция для получения цены фиатной валюты----------------------
 
@@ -289,9 +286,10 @@ def choice():
     label_kva.pack_forget()
     if s_val:
         get_price()
+        button_graf.pack(side=RIGHT, padx=5)
     else:
         exchange()
-
+        button_graf.pack_forget()
 
 # Кнопка получения курса
 
@@ -321,6 +319,8 @@ t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold",
                      foreground='Red', background='White', borderwidth=1, relief=SOLID)
 t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
 t_label8 = ttk.Label(f5, text='')
+
+button_graf = Button(f2, command=get_price_graf, text='график')
 
 # ------------------------------Загрузка лягушки------------------------------
 

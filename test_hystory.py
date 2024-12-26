@@ -11,7 +11,8 @@ import base64
 
 import matplotlib.pyplot as plt
 import numpy as np
-
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import tkinter as tk
 # ------------------------------Функция для графика цены криптовалюты----------------------
 
 def get_price_graf():
@@ -20,7 +21,7 @@ def get_price_graf():
     #tg0 = combobox_target.get()
     #target_name = target[tg0]
     tg1 = 'usd' #tg0.lower()
-    days_graf = 100
+    days_graf = 364
 
     # Настройка параметров запроса
     url = f"https://api.coingecko.com/api/v3/coins/{ids}/market_chart?vs_currency={tg1}&days={days_graf}"
@@ -32,7 +33,8 @@ def get_price_graf():
 
         # Обработка ответа
         def unix_to_readable(unix_time):
-            return dt.fromtimestamp(unix_time / 1000).strftime('%H:%M:%S %d.%m.%Y')
+#            return dt.fromtimestamp(unix_time / 1000).strftime('%H:%M:%S %d.%m.%Y')
+            return dt.fromtimestamp(unix_time / 1000).strftime('%d.%m')
 
         if response.status_code == 200:
             data = response.json()
@@ -47,17 +49,29 @@ def get_price_graf():
             y = np.array(graf_price)
 
             # Построение графика
-            plt.figure(figsize=(10, 6))
-            plt.plot(x, y)
+            #plt.figure(figsize=(10, 6))
+            #plt.plot(x, y)
 
             # Дополнительные настройки
-            plt.title('Двумерный график из массива координат')
-            plt.xlabel('Время')
-            plt.ylabel('Ордината')
-            plt.grid(True)
-
+            #plt.title('Двумерный график из массива координат')
+            #plt.xlabel('Время')
+            #plt.ylabel('Ордината')
+            #plt.grid(True)
+#
             # Отображение графика
-            plt.show()
+            #plt.show()
+
+            fig, ax = plt.subplots()
+            ax.plot(x, y)
+            ax.set_title('Двумерный график из массива координат')
+            ax.set_xlabel('Время')
+            #ax.set_ylabel('Ордината')
+            x_ticks = np.arange(0, days_graf, days_graf//12)
+            ax.set_xticks(x_ticks)
+            ax.grid(True)
+            canvas = FigureCanvasTkAgg(fig, master=window)
+            canvas.draw()
+            canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
@@ -68,8 +82,13 @@ def get_price_graf():
 
 # ---------------------Создание графического интерфейса----------------------
 
-#window = Tk()
+window = Tk()
 
 get_price_graf()
 
-#window.mainloop()
+#fig, ax = plt.subplots()
+#canvas = FigureCanvasTkAgg(fig, master=window)
+#canvas.draw()
+#canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+window.mainloop()
