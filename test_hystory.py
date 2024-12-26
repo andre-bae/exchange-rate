@@ -15,15 +15,15 @@ import numpy as np
 # ------------------------------Функция для графика цены криптовалюты----------------------
 
 def get_price_graf():
-    cr_coin = combobox_crypta.get()
-    ids = cr_coin.lower()
-    tg0 = combobox_target.get()
-    target_name = target[tg0]
-    tg1 = tg0.lower()
+    #cr_coin = combobox_crypta.get()
+    ids = 'bitcoin' # cr_coin.lower()
+    #tg0 = combobox_target.get()
+    #target_name = target[tg0]
+    tg1 = 'usd' #tg0.lower()
     days_graf = 100
 
     # Настройка параметров запроса
-    url = f"https://api.coingecko.com/api/v3/coins/bitc{ids}oin/market_chart?vs_currency={tg1}&days={days_graf}"
+    url = f"https://api.coingecko.com/api/v3/coins/{ids}/market_chart?vs_currency={tg1}&days={days_graf}"
     headers = {"accept": "application/json"}
 
     try:
