@@ -1,3 +1,4 @@
+import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as fd
@@ -10,6 +11,7 @@ import sys
 import base64
 
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 
 from list_all_coins import *
@@ -128,9 +130,9 @@ def get_price_graf():
     cr_coin = combobox_crypta.get()
     ids = cr_coin.lower()
     tg0 = combobox_target.get()
-    target_name = target[tg0]
+    #target_name = target[tg0]
     tg1 = tg0.lower()
-    days_graf = 100
+    days_graf = 365
 
     # Настройка параметров запроса
     url = f"https://api.coingecko.com/api/v3/coins/{ids}/market_chart?vs_currency={tg1}&days={days_graf}"
@@ -142,7 +144,7 @@ def get_price_graf():
 
         # Обработка ответа
         def unix_to_readable(unix_time):
-            return dt.fromtimestamp(unix_time / 1000).strftime('%H:%M:%S %d.%m.%Y')
+            return dt.fromtimestamp(unix_time / 1000).strftime('%d.%m')
 
         if response.status_code == 200:
             data = response.json()
@@ -156,18 +158,30 @@ def get_price_graf():
             x = np.array(readable_times)
             y = np.array(graf_price)
 
-            # Построение графика
-            plt.figure(figsize=(10, 6))
-            plt.plot(x, y)
+            def cancel_wind_graf():
+                wind_graf.grab_release()
+                wind_graf.destroy()
+                button_graf.pack_forget()
 
-            # Дополнительные настройки
-            plt.title('Двумерный график из массива координат')
-            plt.xlabel('Время')
-            plt.ylabel('Ордината')
-            plt.grid(True)
+            fig, ax = plt.subplots()
+            ax.plot(x, y)
+            ax.set_title(f'График курса {cr_coin} к {tg0} за {days_graf} дней')
+            ax.set_xlabel('Даты')
+            ax.set_ylabel(f'Курс {cr_coin} к {tg0}')
+            x_ticks = np.arange(0, days_graf, days_graf//12)
+            ax.set_xticks(x_ticks)
+            ax.grid(True)
 
-            # Отображение графика
-            plt.show()
+            wind_graf = Toplevel()
+            wind_graf.title(f"График курса {cr_coin}")
+            wind_graf.geometry("1000x400")
+            wind_graf.grab_set()
+            wind_graf.protocol("WM_DELETE_WINDOW", lambda: cancel_wind_graf())
+            #wind_graf.resizable(False, True)
+
+            canvas = FigureCanvasTkAgg(fig, master=wind_graf)
+            canvas.draw()
+            canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
@@ -177,6 +191,10 @@ def get_price_graf():
 
 
 # ---------------------Создание графического интерфейса----------------------
+
+
+def quit1():
+    window.destroy()
 
 window = Tk()
 
@@ -193,7 +211,7 @@ window.resizable(False, False)
 # window.attributes("-toolwindow", True)
 window.title("Актуальные Курсы ВАлют более 160 стран")
 window.geometry("480x300")
-
+window.protocol("WM_DELETE_WINDOW", lambda: quit1())
 
 f1 = Frame(window, borderwidth=1, relief=SOLID)
 f1.pack(padx=10)
@@ -294,17 +312,17 @@ def choice():
 # Кнопка получения курса
 
 def button_kva_enter(event):
-    global img_kva, img_hoverg_kva
-    img_hoverg_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva2.gif")))
-    button_kva.config(image=img_hoverg_kva)
+    global img_hover_kva
+    button_kva.config(image=img_hover_kva)
 
 
 def button_kva_leave(event):
-    global img_kva, img_hoverg_kva
+    global img_kva
     button_kva.config(image=img_kva)
 
 
 img_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva.gif")))
+img_hover_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva2.gif")))
 button_kva = Button(f1, image=img_kva, command=choice, relief='flat', borderwidth=0)
 button_kva.grid(row=2, column=2, padx=10, sticky=E)
 button_kva.bind("<Enter>", button_kva_enter)
@@ -398,11 +416,11 @@ def select_fiat_coins():
     def ok_wind_select():
         list_fiat_FIAT.clear()
         for fiat in list_fiat:
-            for money in list_fiat_all_FIAT:
-                if fiat == money.country:
-                    list_fiat_FIAT.append(money)
-        fi = list(map(lambda p: p.country, list_fiat_FIAT))
-        combobox_fiat['values'] = fi
+            for coins in list_fiat_all_FIAT:
+                if fiat == coins.country:
+                    list_fiat_FIAT.append(coins)
+        f_i = list(map(lambda p: p.country, list_fiat_FIAT))
+        combobox_fiat['values'] = f_i
         combobox_fiat.current(0)
         fi_var.set(combobox_fiat['values'][0])
         cancel_wind_select()
@@ -421,12 +439,12 @@ def select_fiat_coins():
             if len(list_test) > 0:
                 list_fiat.clear()
                 for fiat in list_test:
-                    for money in list_fiat_all_FIAT:
-                        if fiat == money.country:
+                    for coins in list_fiat_all_FIAT:
+                        if fiat == coins.country:
                             list_fiat.append(fiat)
                 fiat_var.set(list_fiat)
         except FileNotFoundError:
-            mb.showerror("Ошибка", f"Файл {file} не найден")
+            mb.showerror("Ошибка", "Файл не найден")
         except Exception as e:
             mb.showerror("Ошибка", f"Произошла ошибка: {e}")
 
@@ -485,24 +503,21 @@ def select_fiat_coins():
 # ------------------------------------Кнопка настройки-----------------------------
 
 def settings_enter(event):
-    global img_settings, img_hoverg_settings
-    img_hoverg_settings = ImageTk.PhotoImage(Image.open(resource_path("settings2.gif")))
-    button_settings.config(image=img_hoverg_settings)
+    global img_hover_settings
+    button_settings.config(image=img_hover_settings)
 
 
 def settings_leave(event):
-    global img_settings, img_hoverg_settings
+    global img_settings
     button_settings.config(image=img_settings)
 
 
 img_settings = ImageTk.PhotoImage(Image.open(resource_path("settings.gif")))
+img_hover_settings = ImageTk.PhotoImage(Image.open(resource_path("settings2.gif")))
 button_settings = Button(f1, image=img_settings, command=select_fiat_coins, relief='flat', borderwidth=0)
 button_settings.grid(row=0, column=0, padx=(0,5), sticky=E)
 button_settings.bind("<Enter>", settings_enter)
 button_settings.bind("<Leave>", settings_leave)
 
-
-def quit1():
-    window.destroy()
 
 window.mainloop()

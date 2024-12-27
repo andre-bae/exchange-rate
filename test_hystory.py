@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
+import pandas as pd
+import matplotlib.dates as mdates
 # ------------------------------Функция для графика цены криптовалюты----------------------
 
 def get_price_graf():
@@ -69,6 +71,22 @@ def get_price_graf():
             x_ticks = np.arange(0, days_graf, days_graf//12)
             ax.set_xticks(x_ticks)
             ax.grid(True)
+
+            # Задаем формат даты для оси X
+            #ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+
+            # Создаем локатор для первой даты каждого месяца
+            #monthLocator = mdates.MonthLocator()
+            #yearlyLocator = mdates.YearLocator()
+
+            # Настраиваем сетку
+            #ax.xaxis.set_major_locator(monthLocator)
+            #ax.xaxis.set_minor_locator(yearlyLocator)
+
+            # Добавляем сетку
+            #ax.grid(True, which='major', linestyle='-', linewidth=0.5, color='gray')
+            #ax.grid(True, which='minor', linestyle='--', linewidth=0.25, color='lightgray')
+
             canvas = FigureCanvasTkAgg(fig, master=window)
             canvas.draw()
             canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
