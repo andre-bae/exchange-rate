@@ -321,8 +321,8 @@ def button_kva_leave(event):
     button_kva.config(image=img_kva)
 
 
-img_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva.gif")))
-img_hover_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva2.gif")))
+img_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva3.gif")))
+img_hover_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva4.gif")))
 button_kva = Button(f1, image=img_kva, command=choice, relief='flat', borderwidth=0)
 button_kva.grid(row=2, column=2, padx=10, sticky=E)
 button_kva.bind("<Enter>", button_kva_enter)
@@ -338,8 +338,23 @@ t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold",
 t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
 t_label8 = ttk.Label(f5, text='')
 
-button_graf = Button(f2, command=get_price_graf, text='график')
+# Кнопка получения графика криптовалюты
 
+def button_graf_enter(event):
+    global img_hover_graf
+    button_graf.config(image=img_hover_graf)
+
+
+def button_graf_leave(event):
+    global img_graf
+    button_graf.config(image=img_graf)
+
+
+img_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf1.jpg")))
+img_hover_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf2.jpg")))
+button_graf = Button(f2, image=img_graf, command=get_price_graf, borderwidth=3)
+button_graf.bind("<Enter>", button_graf_enter)
+button_graf.bind("<Leave>", button_graf_leave)
 # ------------------------------Загрузка лягушки------------------------------
 
 frog = Image.open(resource_path("frog4.gif"))
