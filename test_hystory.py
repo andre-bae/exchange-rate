@@ -35,19 +35,21 @@ def get_price_graf():
 
         # Обработка ответа
         def unix_to_readable(unix_time):
-#            return dt.fromtimestamp(unix_time / 1000).strftime('%H:%M:%S %d.%m.%Y')
-            return dt.fromtimestamp(unix_time / 1000).strftime('%d.%m')
+            return dt.fromtimestamp(unix_time / 1000).strftime('%H:%M:%S %d.%m.%Y')
+#            return dt.fromtimestamp(unix_time / 1000).strftime('%d.%m.%Y')
 
         if response.status_code == 200:
             data = response.json()
 
             graf_time = [row[0] for row in data['prices']]
             readable_times = [unix_to_readable(time) for time in graf_time]
+#            readable_times = [(time / 1000) for time in graf_time]
 
             graf_price = [row[1] for row in data['prices']]
 
             # Создание массивов координат
             x = np.array(readable_times)
+            #x = np.array(graf_time)
             y = np.array(graf_price)
 
             # Построение графика
@@ -68,23 +70,22 @@ def get_price_graf():
             ax.set_title('Двумерный график из массива координат')
             ax.set_xlabel('Время')
             #ax.set_ylabel('Ордината')
-            x_ticks = np.arange(0, days_graf, days_graf//12)
-            ax.set_xticks(x_ticks)
-            ax.grid(True)
+            #x_ticks = np.arange(0, days_graf, days_graf//12)
+            #ax.set_xticks(x_ticks)
+            #ax.grid(True)
 
-            # Задаем формат даты для оси X
-            #ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-
-            # Создаем локатор для первой даты каждого месяца
-            #monthLocator = mdates.MonthLocator()
-            #yearlyLocator = mdates.YearLocator()
-
-            # Настраиваем сетку
-            #ax.xaxis.set_major_locator(monthLocator)
-            #ax.xaxis.set_minor_locator(yearlyLocator)
-
-            # Добавляем сетку
-            #ax.grid(True, which='major', linestyle='-', linewidth=0.5, color='gray')
+             #Задаем формат даты для оси X
+#            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+             #Создаем локатор для первой даты каждого месяца
+            month_locator = mdates.MonthLocator(bymonthday=(1))
+            #yearly_locator = mdates.YearLocator()
+             #Настраиваем сетку
+            ax.xaxis.set_major_locator(month_locator)
+#            ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%m.%Y'))
+            #ax.xaxis.set_minor_locator(yearly_locator)
+             #Добавляем сетку
+            ax.grid(True, which='major', linestyle='-', linewidth=0.5, color='gray')
             #ax.grid(True, which='minor', linestyle='--', linewidth=0.25, color='lightgray')
 
             canvas = FigureCanvasTkAgg(fig, master=window)
@@ -101,7 +102,8 @@ def get_price_graf():
 # ---------------------Создание графического интерфейса----------------------
 
 window = Tk()
-
+t_label1 = ttk.Label(window, text='На ', font="Helvetica 10")
+t_label1.pack(side=LEFT, padx=5)
 get_price_graf()
 
 #fig, ax = plt.subplots()

@@ -130,7 +130,6 @@ def get_price_graf():
     cr_coin = combobox_crypta.get()
     ids = cr_coin.lower()
     tg0 = combobox_target.get()
-    #target_name = target[tg0]
     tg1 = tg0.lower()
     days_graf = 365
 
@@ -159,6 +158,7 @@ def get_price_graf():
             y = np.array(graf_price)
 
             def cancel_wind_graf():
+                plt.close(fig)
                 wind_graf.grab_release()
                 wind_graf.destroy()
                 button_graf.pack_forget()
@@ -177,7 +177,6 @@ def get_price_graf():
             wind_graf.geometry("1000x400")
             wind_graf.grab_set()
             wind_graf.protocol("WM_DELETE_WINDOW", lambda: cancel_wind_graf())
-            #wind_graf.resizable(False, True)
 
             canvas = FigureCanvasTkAgg(fig, master=wind_graf)
             canvas.draw()
@@ -355,6 +354,7 @@ img_hover_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf2.jpg")))
 button_graf = Button(f2, image=img_graf, command=get_price_graf, borderwidth=3)
 button_graf.bind("<Enter>", button_graf_enter)
 button_graf.bind("<Leave>", button_graf_leave)
+
 # ------------------------------Загрузка лягушки------------------------------
 
 frog = Image.open(resource_path("frog4.gif"))
