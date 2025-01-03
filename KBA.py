@@ -15,7 +15,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 
 from list_all_coins import *
-#from test_hystory import *
 
 
 # записываем полные пути к файлам картинок чтобы их засунуть в один ехе файл потом
@@ -66,7 +65,6 @@ def exchange():
             response = requests.get(f'https://open.er-api.com/v6/latest/{base_code}')
             response.raise_for_status()
             data = response.json()
-#            print(data)
             update_time = data['time_last_update_unix']
             if target_code in data['rates']:
                 exchange_rate = data['rates'][target_code]
@@ -99,10 +97,8 @@ def get_price():
     headers = {"Accepts": "application/json"}
 
     try:
-        # Выполнение GET-запроса
         response = requests.get(url=url, params=params, headers=headers)
 
-        # Обработка ответа
         if response.status_code == 200:
             data = response.json()
             update_time = data[ids]['last_updated_at']
@@ -117,11 +113,11 @@ def get_price():
                     crypt_price = crypt_price[:-ii] + ' ' + crypt_price[-ii:]
                     ii +=4
             label_config(cr_coin, crypt_price, target_name, update_time)
+
         else:
             mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
         mb.showerror("Ошибка", f"Произошла ошибка при выполнении запроса: {e}")
-
 
 
 # ------------------------------Функция для графика цены криптовалюты----------------------
@@ -133,15 +129,13 @@ def get_price_graf():
     tg1 = tg0.lower()
     days_graf = 365
 
-    # Настройка параметров запроса
     url = f"https://api.coingecko.com/api/v3/coins/{ids}/market_chart?vs_currency={tg1}&days={days_graf}"
     headers = {"accept": "application/json"}
 
     try:
-        # Выполнение GET-запроса
         response = requests.get(url, headers=headers)
 
-        # Обработка ответа
+
         def unix_to_readable(unix_time):
             return dt.fromtimestamp(unix_time / 1000).strftime('%d.%m')
 
@@ -153,16 +147,8 @@ def get_price_graf():
 
             graf_price = [row[1] for row in data['prices']]
 
-            # Создание массивов координат
             x = np.array(readable_times)
             y = np.array(graf_price)
-
-            def cancel_wind_graf():
-                plt.close(fig)
-                wind_graf.grab_release()
-                wind_graf.destroy()
-                button_graf.pack_forget()
-
             fig, ax = plt.subplots()
             ax.plot(x, y)
             ax.set_title(f'График курса {cr_coin} к {tg0} за {days_graf} дней')
@@ -171,6 +157,13 @@ def get_price_graf():
             x_ticks = np.arange(0, days_graf, days_graf//12)
             ax.set_xticks(x_ticks)
             ax.grid(True)
+
+
+            def cancel_wind_graf():
+                plt.close(fig)
+                wind_graf.grab_release()
+                wind_graf.destroy()
+                button_graf.pack_forget()
 
             wind_graf = Toplevel()
             wind_graf.title(f"График курса {cr_coin}")
@@ -191,11 +184,8 @@ def get_price_graf():
 
 # ---------------------Создание графического интерфейса----------------------
 
-
 def quit1():
     window.destroy()
-
-window = Tk()
 
 # Преобразование иконки в base64
 with open(resource_path("frog2.ico"), 'rb') as image:
@@ -205,6 +195,7 @@ with open(resource_path("frog2.ico"), 'rb') as image:
 with open(resource_path("frog2.ico"), 'wb') as image:
     image.write(base64.b64decode(binary_icon))
 
+window = Tk()
 window.iconbitmap(resource_path("frog2.ico"))
 window.resizable(False, False)
 # window.attributes("-toolwindow", True)
@@ -222,7 +213,6 @@ f4 = Frame(window)
 f4.pack(fill=BOTH, expand=True, anchor=NW, padx=10, pady=5)
 f5 = Frame(window)
 f5.pack(fill=BOTH, expand=True, anchor=NW, padx=10)
-
 
 # ------------------------------Выбор криптовалюты------------------------------
 
@@ -248,6 +238,7 @@ combobox_crypta = ttk.Combobox(f1, textvariable = cr_var, values = cr,
 combobox_crypta.grid(row=0, column=2, padx=10, pady=5, sticky=EW)
 
 # ---------------------------Выбор фиатной валюты-------------------------------
+
 f_text = "Валюта".rjust(20)
 fiat_label = ttk.Label(f1, text=f_text, width=14)
 fiat_label.grid(row=0, column=1, padx=10, pady=5, sticky=E)
@@ -269,6 +260,7 @@ target = {
 }
 tg = list(target.keys())
 tg_var = StringVar(value=tg[1])
+
 combobox_target = ttk.Combobox(f1, textvariable=tg_var, values=tg, state="readonly")
 combobox_target.grid(row=1, column=2, padx=10, pady=5, sticky=EW)
 
@@ -290,7 +282,6 @@ def select():
         fiat_label.grid(row=0, column=1, padx=10, pady=5, sticky=E)
         combobox_fiat.grid(row=0, column=2, padx=10, pady=5, sticky=EW)
 
-
 check_crypta = IntVar()
 enabled_checkbutton = Checkbutton(f1, text="КриптоВАлюта", variable=check_crypta, command=select)
 enabled_checkbutton.grid(row=2, column=0, columnspan=2, padx=10, pady=5, sticky=EW)
@@ -308,6 +299,7 @@ def choice():
         exchange()
         button_graf.pack_forget()
 
+
 # Кнопка получения курса
 
 def button_kva_enter(event):
@@ -318,7 +310,6 @@ def button_kva_enter(event):
 def button_kva_leave(event):
     global img_kva
     button_kva.config(image=img_kva)
-
 
 img_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva3.gif")))
 img_hover_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva4.gif")))
@@ -336,6 +327,7 @@ t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold",
                      foreground='Red', background='White', borderwidth=1, relief=SOLID)
 t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
 t_label8 = ttk.Label(f5, text='')
+
 
 # Кнопка получения графика криптовалюты
 
@@ -479,8 +471,6 @@ def select_fiat_coins():
         except Exception as e:
             mb.showerror("Ошибка", f"Произошла ошибка: {e}")
 
-
-
 # ---------------------------------геометрия всплывающего окна настройки---------------
 
     wind_select = Toplevel()
@@ -526,13 +516,11 @@ def settings_leave(event):
     global img_settings
     button_settings.config(image=img_settings)
 
-
 img_settings = ImageTk.PhotoImage(Image.open(resource_path("settings.gif")))
 img_hover_settings = ImageTk.PhotoImage(Image.open(resource_path("settings2.gif")))
 button_settings = Button(f1, image=img_settings, command=select_fiat_coins, relief='flat', borderwidth=0)
 button_settings.grid(row=0, column=0, padx=(0,5), sticky=E)
 button_settings.bind("<Enter>", settings_enter)
 button_settings.bind("<Leave>", settings_leave)
-
 
 window.mainloop()
