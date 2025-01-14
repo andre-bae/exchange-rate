@@ -341,8 +341,8 @@ def button_graf_leave(event):
     button_graf.config(image=img_graf)
 
 
-img_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf1.jpg")))
-img_hover_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf2.jpg")))
+img_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf3.gif")))
+img_hover_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf4.gif")))
 button_graf = Button(f2, image=img_graf, command=get_price_graf, borderwidth=3)
 button_graf.bind("<Enter>", button_graf_enter)
 button_graf.bind("<Leave>", button_graf_leave)
