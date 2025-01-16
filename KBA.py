@@ -516,7 +516,7 @@ def settings_leave(event):
     global img_settings
     button_settings.config(image=img_settings)
 
-img_settings = ImageTk.PhotoImage(Image.open(resource_path("settings.gif")))
+img_settings = ImageTk.PhotoImage(Image.open(resource_path("settings1.gif")))
 img_hover_settings = ImageTk.PhotoImage(Image.open(resource_path("settings2.gif")))
 button_settings = Button(f1, image=img_settings, command=select_fiat_coins, relief='flat', borderwidth=0)
 button_settings.grid(row=0, column=0, padx=(0,5), sticky=E)
