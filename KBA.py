@@ -200,19 +200,28 @@ window.iconbitmap(resource_path("frog2.ico"))
 window.resizable(False, False)
 # window.attributes("-toolwindow", True)
 window.title("Актуальные Курсы ВАлют более 160 стран")
-window.geometry("480x300")
+window.geometry("480x320")
 window.protocol("WM_DELETE_WINDOW", lambda: quit1())
 
 f1 = Frame(window, borderwidth=1, relief=SOLID)
-f1.pack(padx=10)
+f1.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+f_button_graf = Frame(window)
+f_button_graf.grid(row=1, rowspan=3, column=1, padx=10, pady=(0, 10), sticky="ne")
 f2 = Frame(window)
-f2.pack(fill=BOTH, expand=True, anchor=NW, padx=10, pady=(10,0))
+f2.grid(row=1, column=0, padx=10, pady=(0, 10), sticky="nw")
 f3 = Frame(window)
-f3.pack(fill=BOTH, expand=True, anchor=NW, padx=10)
+f3.grid(row=2, column=0, padx=10, pady=(0, 10), sticky="nw")
 f4 = Frame(window)
-f4.pack(fill=BOTH, expand=True, anchor=NW, padx=10, pady=5)
+f4.grid(row=3, column=0, padx=10, pady=(0, 10), sticky="nw")
 f5 = Frame(window)
-f5.pack(fill=BOTH, expand=True, anchor=NW, padx=10)
+f5.grid(row=4, column=0, columnspan=2, padx=10, pady=(0, 10), sticky="ew")
+
+# Настройка растягивания столбцов и строк
+window.grid_columnconfigure(0, weight=1)  # Левый столбец (фреймы f2-f4) растягивается
+window.grid_columnconfigure(1, weight=0)  # Правый столбец (кнопка) не растягивается
+window.grid_rowconfigure(1, weight=1)     # Строки растягиваются
+window.grid_rowconfigure(2, weight=1)
+window.grid_rowconfigure(3, weight=1)
 
 # ------------------------------Выбор криптовалюты------------------------------
 
@@ -343,21 +352,22 @@ def button_graf_leave(event):
 
 img_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf3.gif")))
 img_hover_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf4.gif")))
-button_graf = Button(f2, image=img_graf, command=get_price_graf, borderwidth=3)
+button_graf = Button(f_button_graf, image=img_graf, command=get_price_graf, borderwidth=3)
 button_graf.bind("<Enter>", button_graf_enter)
 button_graf.bind("<Leave>", button_graf_leave)
+
 
 # ------------------------------Загрузка лягушки------------------------------
 
 frog = Image.open(resource_path("frog4.gif"))
 # frog = frog.resize((150, 150))
 frog_tk = ImageTk.PhotoImage(frog)
-label_frog = Label(window, image=frog_tk)
+label_frog = Label(f_button_graf, image=frog_tk)
 label_frog.pack(side=RIGHT)
 
 kva = Image.open(resource_path("kva2.gif"))
 kva_tk = ImageTk.PhotoImage(kva)
-label_kva = Label(window, image=kva_tk)
+label_kva = Label(f2, image=kva_tk)
 label_kva.pack(side=LEFT)
 
 
@@ -475,7 +485,7 @@ def select_fiat_coins():
 
     wind_select = Toplevel()
     wind_select.title("Выбор валют")
-    wind_select.geometry("700x300")
+    wind_select.geometry("730x300")
     wind_select.grab_set()
     wind_select.protocol("WM_DELETE_WINDOW", lambda: cancel_wind_select())
     wind_select.resizable(False, True)
@@ -486,23 +496,29 @@ def select_fiat_coins():
     wind_select.rowconfigure(3, weight=1)
  #   wind_select.rowconfigure(4, weight=1)
 
-    ttk.Button(wind_select, text="Добавить", command=add_fiat).grid(row=0, column=1, padx=6, pady=6)
-    ttk.Button(wind_select, text="Удалить", command=delete).grid(row=0, column=5, padx=5, pady=5)
-    ttk.Button(wind_select, text="▲", command=up_step).grid(row=1, column=5, padx=5, pady=5)
-    ttk.Button(wind_select, text="▼", command=down_step).grid(row=2, column=5, padx=5, pady=5)
-    ttk.Button(wind_select, text="Очистить", command=del_all).grid(row=3, column=5, padx=5, pady=5)
-    ttk.Button(wind_select, text="Ok", command=ok_wind_select).grid(row=4, column=2, sticky=S, padx=5, pady=5)
-    ttk.Button(wind_select, text="Загрузить", command=load_coins).grid(row=4, column=3, sticky=S, padx=5, pady=5)
-    ttk.Button(wind_select, text="Сохранить", command=save_coins).grid(row=4, column=4, sticky=S, padx=5, pady=5)
-    ttk.Button(wind_select, text="Cancel", command=cancel_wind_select).grid(row=4, column=5, sticky=S, padx=5, pady=5)
+    ttk.Button(wind_select, text="Добавить", command=add_fiat).grid(row=0, column=2, padx=6, pady=6)
+    ttk.Button(wind_select, text="Удалить", command=delete).grid(row=0, column=7, padx=5, pady=5)
+    ttk.Button(wind_select, text="▲", command=up_step).grid(row=1, column=7, padx=5, pady=5)
+    ttk.Button(wind_select, text="▼", command=down_step).grid(row=2, column=7, padx=5, pady=5)
+    ttk.Button(wind_select, text="Очистить", command=del_all).grid(row=3, column=7, padx=5, pady=5)
+    ttk.Button(wind_select, text="Ok", command=ok_wind_select).grid(row=4, column=3, sticky=S, padx=5, pady=5)
+    ttk.Button(wind_select, text="Загрузить", command=load_coins).grid(row=4, column=4, sticky=S, padx=5, pady=5)
+    ttk.Button(wind_select, text="Сохранить", command=save_coins).grid(row=4, column=5, sticky=S, padx=5, pady=5)
+    ttk.Button(wind_select, text="Cancel", command=cancel_wind_select).grid(row=4, column=7, sticky=S, padx=5, pady=5)
 
     fiat_all_var = Variable(value=list_fiat_all_country)
     fiat_all_listbox = Listbox(wind_select, listvariable=fiat_all_var, width=41)
-    fiat_all_listbox.grid(row=0, column=0, rowspan=5, sticky=NS, padx=(10,5), pady=(5,10))
+    fiat_all_listbox.grid(row=0, column=0, rowspan=5, sticky=NS, padx=(10,0), pady=(5,10))
+    scrollbar_all = Scrollbar(wind_select, orient="vertical", command=fiat_all_listbox.yview)
+    scrollbar_all.grid(row=0, column=1, rowspan=5, sticky=NS, pady=(5, 10))
+    fiat_all_listbox.config(yscrollcommand=scrollbar_all.set)
 
     fiat_var = Variable(value=list_fiat)
     fiat_listbox = Listbox(wind_select, listvariable=fiat_var, width=35, selectmode="single")
-    fiat_listbox.grid(row=0, column=2, rowspan=4, columnspan=3, sticky=NSEW, padx=5, pady=5)
+    fiat_listbox.grid(row=0, column=3, rowspan=4, columnspan=3, sticky=NSEW, padx=5, pady=5)
+    scrollbar = Scrollbar(wind_select, orient="vertical", command=fiat_listbox.yview)
+    scrollbar.grid(row=0, column=6, rowspan=5, sticky=NS, pady=(5, 10))
+    fiat_listbox.config(yscrollcommand=scrollbar.set)
 
 
 # ------------------------------------Кнопка настройки-----------------------------
