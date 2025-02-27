@@ -1,21 +1,25 @@
 import tkinter as tk
 from tkinter import *
-from tkinter import ttk
-from tkinter import filedialog as fd
-from tkinter import messagebox as mb
+from tkinter import ttk, filedialog, messagebox
 from PIL import Image, ImageTk
 import requests
-from datetime import datetime as dt
+from datetime import datetime, timedelta
 import os
 import sys
 import base64
 
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
+from xml.etree import ElementTree
 
 from list_all_coins import *
 
+fiat_cod = None
+fiat_name = ''
+plt.rcParams['toolbar'] = 'None'
+multiplier = 1.0
 
 # записываем полные пути к файлам картинок чтобы их засунуть в один ехе файл потом
 def resource_path(relative_path):
@@ -31,25 +35,49 @@ s_val = 0
 # --------------------Функция оформления вывода результата в метки------------------------
 
 def label_config(money, price, name, time):
-    t_label2.config(text=f"{dt.now().strftime('%H часов %M минут    %d.%m.%Y')}")
+    t_label2.config(text=f"{datetime.now().strftime('%H часов %M минут    %d.%m.%Y')}")
     t_label4.config(text=f"{money}")
     t_label6.config(text=f" {price} ")
     t_label7.config(text=f" {name}")
     t_label8.config(text=f"( Последнее обновление курса: "
-                         f"{dt.fromtimestamp(time).strftime('%H:%M:%S %d.%m.%Y')} )")
+                         f"{datetime.fromtimestamp(time).strftime('%H:%M:%S %d.%m.%Y')} )")
     t_label1.pack(side=LEFT, padx=5)
     t_label2.pack(side=LEFT, padx=5)
     t_label3.pack(side=LEFT, padx=5)
     t_label4.pack(side=LEFT, padx=5)
-    t_label5.pack(side=LEFT, padx=5)
+#    t_label5.pack(side=LEFT, padx=5)
     t_label6.pack(side=LEFT, padx=10)
     t_label7.pack(side=LEFT, padx=5)
     t_label8.pack(side=LEFT, padx=5)
 
 
+# ----------------------Получение курса базовой валюты: крипта или фиатная валюта-----------------
+
+def choice():
+    global fiat_cod, fiat_name, multiplier
+    label_frog.pack_forget()
+    label_kva.pack_forget()
+    if s_val:
+        get_price()
+        fiat_cod = None
+        button_graf.pack(side=RIGHT, padx=5)
+    else:
+        exchange()
+        for fit in list_fiat_FIAT:
+            if fit.country == combobox_fiat.get():
+                fiat_cod = fit.optional_history
+                fiat_name = fit.text
+                if combobox_target.get() == 'Rub' and fiat_cod != None:
+                    button_graf.pack(side=RIGHT, padx=5)
+                break
+            else:
+                button_graf.pack_forget()
+
+
 # ---------------------------Функция для получения цены фиатной валюты----------------------
 
 def exchange():
+    global multiplier
     target_name = combobox_target.get()
     target_code = target_name.upper()
     fi_coin = combobox_fiat.get()
@@ -70,12 +98,13 @@ def exchange():
                 exchange_rate = data['rates'][target_code]
                 fiat_price = f"{exchange_rate}"
                 label_config(coin_name, fiat_price, target_name, update_time)
+                multiplier = float(fiat_price)
             else:
-                mb.showerror("Ошибка", f"Валюта {target_code} не найдена")
+                messagebox.showerror("Ошибка", f"Валюта {target_code} не найдена")
         except Exception as e:
-            mb.showerror("Ошибка", f"Ошибка: {e}")
+            messagebox.showerror("Ошибка", f"Ошибка: {e}")
     else:
-        mb.showwarning("Внимание", "Выберите коды валют")
+        messagebox.showwarning("Внимание", "Выберите коды валют")
 
 
 # ------------------------------Функция для получения цены криптовалюты----------------------
@@ -115,71 +144,159 @@ def get_price():
             label_config(cr_coin, crypt_price, target_name, update_time)
 
         else:
-            mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
+            messagebox.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
     except requests.exceptions.RequestException as e:
-        mb.showerror("Ошибка", f"Произошла ошибка при выполнении запроса: {e}")
+        messagebox.showerror("Ошибка", f"Произошла ошибка при выполнении запроса: {e}")
 
+
+# Функция для получения данных о курсе валюты к рублю за последний год
+def get_currency_rate(currency_code):
+    """
+    Получает курс выбранной валюты к рублю за последний год.
+    :param currency_code: Код валюты (например, 'R01235' для доллара, 'R01239' для евро).
+    :return: Словарь с датами и курсами.
+    """
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=365)
+
+    # URL API Центрального банка России
+    url = f"https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1={start_date.strftime('%d/%m/%Y')}&date_req2={end_date.strftime('%d/%m/%Y')}&VAL_NM_RQ={currency_code}"
+    response = requests.get(url)
+
+    # Парсим XML-ответ
+    root = ElementTree.fromstring(response.content)
+
+    currency_rates1 = {}
+    for record in root.findall('Record'):
+        date = datetime.strptime(record.attrib['Date'], '%d.%m.%Y').date()
+        rate = float(record.find('Value').text.replace(',', '.'))
+        currency_rates1[date] = rate
+
+    return currency_rates1
+
+
+# Функция для построения графика
+def plot_currency_rate(currency_rates, currency_name):
+    """
+    Строит график курса валюты к рублю.
+    :param currency_rates: Словарь с датами и курсами.
+    :param currency_name: Название валюты (например, 'USD/RUB' или 'EUR/RUB').
+    """
+    global multiplier
+    dates = list(currency_rates.keys())
+    rates = list(currency_rates.values())
+
+    # Создаем фигуру
+    fig, ax = plt.subplots(figsize=(8, 4))
+
+    # Убираем маркеры (параметр marker)
+    ax.plot(dates, rates, label=currency_name, color='blue', linestyle='-')
+
+    # Настраиваем сетку по месяцам
+    ax.xaxis.set_major_locator(mdates.MonthLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
+    plt.xticks(rotation=45)
+
+    # Включаем сетку для основных делений (месяцы)
+    ax.grid(True, which='major', linestyle='--', linewidth=0.5)
+
+    # Заголовок графика
+    ax.set_title(f'Курс {currency_name} за последний год', fontsize=16)
+
+    print(multiplier, rates[-1])
+    multiplier = multiplier/rates[-1]
+    print(multiplier)
+    if multiplier > 5 or multiplier < 0.5:
+        # Если множитель есть, добавляем подпись над осью Y
+        plt.ylabel(f'Курс (руб × {multiplier:.0e})', fontsize=14)
+    else:
+        # Если множителя нет, подпись остается без изменений
+        plt.ylabel('Курс (руб)', fontsize=14)
+
+    plt.tight_layout()
+    plt.gcf().canvas.manager.set_window_title(f"График курса {currency_name}")
+
+
+    # Обработчик закрытия окна
+    def on_close(event):
+        button_graf.pack_forget()
+
+    # Подключаем обработчик события закрытия окна
+    fig.canvas.mpl_connect('close_event', on_close)
+
+    # Отображение графика
+    plt.show()
 
 # ------------------------------Функция для графика цены криптовалюты----------------------
 
 def get_price_graf():
-    cr_coin = combobox_crypta.get()
-    ids = cr_coin.lower()
-    tg0 = combobox_target.get()
-    tg1 = tg0.lower()
-    days_graf = 365
+    global fiat_cod, fiat_name
+    if fiat_cod != None:
+        try:
+            # Получаем данные о курсе
+            currency_rates2 = get_currency_rate(fiat_cod)
+            # Строим график
+            plot_currency_rate(currency_rates2, f"{fiat_name} к рублю")
+        except Exception as e:
+            print(f"Произошла ошибка: {e}")
+    else:
+        cr_coin = combobox_crypta.get()
+        ids = cr_coin.lower()
+        tg0 = combobox_target.get()
+        tg1 = tg0.lower()
+        days_graf = 365
 
-    url = f"https://api.coingecko.com/api/v3/coins/{ids}/market_chart?vs_currency={tg1}&days={days_graf}"
-    headers = {"accept": "application/json"}
+        url = f"https://api.coingecko.com/api/v3/coins/{ids}/market_chart?vs_currency={tg1}&days={days_graf}"
+        headers = {"accept": "application/json"}
 
-    try:
-        response = requests.get(url, headers=headers)
-
-
-        def unix_to_readable(unix_time):
-            return dt.fromtimestamp(unix_time / 1000).strftime('%d.%m')
-
-        if response.status_code == 200:
-            data = response.json()
-
-            graf_time = [row[0] for row in data['prices']]
-            readable_times = [unix_to_readable(time) for time in graf_time]
-
-            graf_price = [row[1] for row in data['prices']]
-
-            x = np.array(readable_times)
-            y = np.array(graf_price)
-            fig, ax = plt.subplots()
-            ax.plot(x, y)
-            ax.set_title(f'График курса {cr_coin} к {tg0} за {days_graf} дней')
-            ax.set_xlabel('Даты')
-            ax.set_ylabel(f'Курс {cr_coin} к {tg0}')
-            x_ticks = np.arange(0, days_graf, days_graf//12)
-            ax.set_xticks(x_ticks)
-            ax.grid(True)
+        try:
+            response = requests.get(url, headers=headers)
 
 
-            def cancel_wind_graf():
-                plt.close(fig)
-                wind_graf.grab_release()
-                wind_graf.destroy()
-                button_graf.pack_forget()
+            def unix_to_readable(unix_time):
+                return datetime.fromtimestamp(unix_time / 1000).strftime('%d.%m')
 
-            wind_graf = Toplevel()
-            wind_graf.title(f"График курса {cr_coin}")
-            wind_graf.geometry("1000x400")
-            wind_graf.grab_set()
-            wind_graf.protocol("WM_DELETE_WINDOW", lambda: cancel_wind_graf())
+            if response.status_code == 200:
+                data = response.json()
 
-            canvas = FigureCanvasTkAgg(fig, master=wind_graf)
-            canvas.draw()
-            canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+                graf_time = [row[0] for row in data['prices']]
+                readable_times = [unix_to_readable(time) for time in graf_time]
 
-        else:
-            mb.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
+                graf_price = [row[1] for row in data['prices']]
 
-    except requests.exceptions.RequestException as e:
-        mb.showerror("Ошибка", f"Произошла ошибка при выполнении запроса: {e}")
+                x = np.array(readable_times)
+                y = np.array(graf_price)
+                fig, ax = plt.subplots()
+                ax.plot(x, y)
+                ax.set_title(f'График курса {cr_coin} к {tg0} за {days_graf} дней')
+                ax.set_xlabel('Даты')
+                ax.set_ylabel(f'Курс {cr_coin} к {tg0}')
+                x_ticks = np.arange(0, days_graf, days_graf//12)
+                ax.set_xticks(x_ticks)
+                ax.grid(True)
+
+
+                def cancel_wind_graf():
+                    plt.close(fig)
+                    wind_graf.grab_release()
+                    wind_graf.destroy()
+                    button_graf.pack_forget()
+
+                wind_graf = Toplevel()
+                wind_graf.title(f"График курса {cr_coin}")
+                wind_graf.geometry("1000x400")
+                wind_graf.grab_set()
+                wind_graf.protocol("WM_DELETE_WINDOW", lambda: cancel_wind_graf())
+
+                canvas = FigureCanvasTkAgg(fig, master=wind_graf)
+                canvas.draw()
+                canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+            else:
+                messagebox.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
+
+        except requests.exceptions.RequestException as e:
+            messagebox.showerror("Ошибка", f"Произошла ошибка при выполнении запроса: {e}")
 
 
 # ---------------------Создание графического интерфейса----------------------
@@ -296,19 +413,6 @@ enabled_checkbutton = Checkbutton(f1, text="КриптоВАлюта", variable=
 enabled_checkbutton.grid(row=2, column=0, columnspan=2, padx=10, pady=5, sticky=EW)
 
 
-# ----------------------Получение курса базовой валюты: крипта или фиатная валюта-----------------
-
-def choice():
-    label_frog.pack_forget()
-    label_kva.pack_forget()
-    if s_val:
-        get_price()
-        button_graf.pack(side=RIGHT, padx=5)
-    else:
-        exchange()
-        button_graf.pack_forget()
-
-
 # Кнопка получения курса
 
 def button_kva_enter(event):
@@ -329,9 +433,9 @@ button_kva.bind("<Leave>", button_kva_leave)
 
 t_label1 = ttk.Label(f2, text='На ', font="Helvetica 10")
 t_label2 = ttk.Label(f2, text='', font="Helvetica 10 bold")
-t_label3 = ttk.Label(f3, text='Текущий курс ', font="Helvetica 10")
+t_label3 = ttk.Label(f3, text='Курс ', font="Helvetica 10")
 t_label4 = ttk.Label(f3, text='', font="Helvetica 10 bold")
-t_label5 = ttk.Label(f3, text=' составляет  ', font="Helvetica 10")
+#t_label5 = ttk.Label(f3, text=' составляет  ', font="Helvetica 10")
 t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold",
                      foreground='Red', background='White', borderwidth=1, relief=SOLID)
 t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
@@ -445,7 +549,7 @@ def select_fiat_coins():
 
     def load_coins():
         try:
-            file = fd.askopenfilename(
+            file = filedialog.askopenfilename(
                 defaultextension=".kva",
                 filetypes=[("KBA файлы", "*.kva"), ("Все файлы", "*.*")]
             )
@@ -461,14 +565,14 @@ def select_fiat_coins():
                             list_fiat.append(fiat)
                 fiat_var.set(list_fiat)
         except FileNotFoundError:
-            mb.showerror("Ошибка", "Файл не найден")
+            messagebox.showerror("Ошибка", "Файл не найден")
         except Exception as e:
-            mb.showerror("Ошибка", f"Произошла ошибка: {e}")
+            messagebox.showerror("Ошибка", f"Произошла ошибка: {e}")
 
 
     def save_coins():
         try:
-            file = fd.asksaveasfilename(
+            file = filedialog.asksaveasfilename(
                 initialfile="my_coins",  # Предлагаемое имя файла
                 defaultextension=".kva",  # Расширение по умолчанию
                 filetypes=[("KBA файлы", "*.kva"),  # Допустимые типы файлов
@@ -477,9 +581,9 @@ def select_fiat_coins():
                 with open(file, 'w') as f:
                     f.write('\n'.join(list_fiat))
         except FileNotFoundError:
-            mb.showerror("Ошибка", "Не удалось сохранить файл")
+            messagebox.showerror("Ошибка", "Не удалось сохранить файл")
         except Exception as e:
-            mb.showerror("Ошибка", f"Произошла ошибка: {e}")
+            messagebox.showerror("Ошибка", f"Произошла ошибка: {e}")
 
 # ---------------------------------геометрия всплывающего окна настройки---------------
 
