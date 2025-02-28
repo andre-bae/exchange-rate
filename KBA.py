@@ -560,7 +560,7 @@ def select_fiat_coins():
     def save_coins():
         try:
             file = filedialog.asksaveasfilename(
-                initialfile="my_coins",  # Предлагаемое имя файла
+                initialfile="default",  # Предлагаемое имя файла
                 defaultextension=".kva",  # Расширение по умолчанию
                 filetypes=[("KBA файлы", "*.kva"),  # Допустимые типы файлов
                            ("Все файлы", "*.*")])
