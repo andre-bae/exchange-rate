@@ -1,4 +1,3 @@
-import tkinter as tk
 from tkinter import *
 from tkinter import ttk, filedialog, messagebox
 from PIL import Image, ImageTk
@@ -10,12 +9,12 @@ import base64
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import numpy as np
+
 from xml.etree import ElementTree
 
 from list_all_coins import *
 
+s_val = 0
 fiat_cod = None
 fiat_name = ''
 plt.rcParams['toolbar'] = 'None'
@@ -24,13 +23,11 @@ multiplier = 1.0
 # записываем полные пути к файлам картинок чтобы их засунуть в один ехе файл потом
 def resource_path(relative_path):
     try:
-        base_path = sys._MEIPASS
-    except:
+        # noinspection PyProtectedMember
+        base_path = sys._MEIPASS  # type: ignore
+    except AttributeError:  # Перехватываем только AttributeError:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
-
-s_val = 0
-
 
 # --------------------Функция оформления вывода результата в метки------------------------
 
@@ -45,7 +42,6 @@ def label_config(money, price, name, time):
     t_label2.pack(side=LEFT, padx=5)
     t_label3.pack(side=LEFT, padx=5)
     t_label4.pack(side=LEFT, padx=5)
-#    t_label5.pack(side=LEFT, padx=5)
     t_label6.pack(side=LEFT, padx=10)
     t_label7.pack(side=LEFT, padx=5)
     t_label8.pack(side=LEFT, padx=5)
@@ -67,7 +63,7 @@ def choice():
             if fit.country == combobox_fiat.get():
                 fiat_cod = fit.optional_history
                 fiat_name = fit.text
-                if combobox_target.get() == 'Rub' and fiat_cod != None:
+                if combobox_target.get() == 'Rub' and fiat_cod is not None:
                     button_graf.pack(side=RIGHT, padx=5)
                 break
             else:
@@ -110,6 +106,7 @@ def exchange():
 # ------------------------------Функция для получения цены криптовалюты----------------------
 
 def get_price():
+    global multiplier
     cr_coin = combobox_crypta.get()
     ids = cr_coin.lower()
     tg0 = combobox_target.get()
@@ -133,6 +130,7 @@ def get_price():
             update_time = data[ids]['last_updated_at']
             price = data[ids][tg1]
             crypt_price = f"{price:.2f}"
+            multiplier = float(price)
 
             # Добавление пробелов в многозначное число
             len1 = len(crypt_price)
@@ -154,37 +152,58 @@ def get_currency_rate(currency_code):
     """
     Получает курс выбранной валюты к рублю за последний год.
     :param currency_code: Код валюты (например, 'R01235' для доллара, 'R01239' для евро).
-    :return: Словарь с датами и курсами.
+    :return: Словарь с датами и курсами или None в случае ошибки.
     """
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=365)
+    try:
+        # Определяем даты начала и конца периода
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=365)
 
-    # URL API Центрального банка России
-    url = f"https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1={start_date.strftime('%d/%m/%Y')}&date_req2={end_date.strftime('%d/%m/%Y')}&VAL_NM_RQ={currency_code}"
-    response = requests.get(url)
+        # URL API Центрального банка России
+        url = f"https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1={start_date.strftime('%d/%m/%Y')}&date_req2={end_date.strftime('%d/%m/%Y')}&VAL_NM_RQ={currency_code}"
 
-    # Парсим XML-ответ
-    root = ElementTree.fromstring(response.content)
+        # Отправляем запрос
+        response = requests.get(url)
+        response.raise_for_status()  # Проверяем, есть ли ошибки HTTP
 
-    currency_rates1 = {}
-    for record in root.findall('Record'):
-        date = datetime.strptime(record.attrib['Date'], '%d.%m.%Y').date()
-        rate = float(record.find('Value').text.replace(',', '.'))
-        currency_rates1[date] = rate
+        # Парсим XML-ответ
+        root = ElementTree.fromstring(response.content)
 
-    return currency_rates1
+        currency_rates = {}
+        for record in root.findall('Record'):
+            try:
+                date = datetime.strptime(record.attrib['Date'], '%d.%m.%Y').date()
+                rate = float(record.find('Value').text.replace(',', '.'))
+                currency_rates[date] = rate
+            except (ValueError, AttributeError, KeyError) as e:
+                messagebox.showerror("Ошибка", f"Ошибка при обработке записи: {e}. Пропускаем запись.")
+                continue
+
+        return currency_rates
+
+    except requests.exceptions.RequestException as e:
+        # Обработка ошибок сети или HTTP
+        messagebox.showerror("Ошибка", f"Ошибка при выполнении запроса: {e}")
+        return None
+    except ElementTree.ParseError as e:
+        # Обработка ошибок парсинга XML
+        messagebox.showerror("Ошибка", f"Ошибка при парсинге XML: {e}")
+        return None
+    except Exception as e:
+        # Обработка всех остальных ошибок
+        messagebox.showerror("Ошибка", f"Неожиданная ошибка: {e}")
+        return None
 
 
 # Функция для построения графика
-def plot_currency_rate(currency_rates, currency_name):
+def plot_currency_rate(dates, rates, currency_name):
     """
     Строит график курса валюты к рублю.
-    :param currency_rates: Словарь с датами и курсами.
+    :param dates: Список с датами.
+    :param rates: Список с курсами.
     :param currency_name: Название валюты (например, 'USD/RUB' или 'EUR/RUB').
     """
     global multiplier
-    dates = list(currency_rates.keys())
-    rates = list(currency_rates.values())
 
     # Создаем фигуру
     fig, ax = plt.subplots(figsize=(8, 4))
@@ -203,9 +222,7 @@ def plot_currency_rate(currency_rates, currency_name):
     # Заголовок графика
     ax.set_title(f'Курс {currency_name} за последний год', fontsize=16)
 
-    print(multiplier, rates[-1])
     multiplier = multiplier/rates[-1]
-    print(multiplier)
     if multiplier > 5 or multiplier < 0.5:
         # Если множитель есть, добавляем подпись над осью Y
         plt.ylabel(f'Курс (руб × {multiplier:.0e})', fontsize=14)
@@ -218,7 +235,7 @@ def plot_currency_rate(currency_rates, currency_name):
 
 
     # Обработчик закрытия окна
-    def on_close(event):
+    def on_close(_):
         button_graf.pack_forget()
 
     # Подключаем обработчик события закрытия окна
@@ -227,18 +244,20 @@ def plot_currency_rate(currency_rates, currency_name):
     # Отображение графика
     plt.show()
 
-# ------------------------------Функция для графика цены криптовалюты----------------------
+# ------------------------------Функция получения данных для графика цены----------------------
 
 def get_price_graf():
     global fiat_cod, fiat_name
-    if fiat_cod != None:
+    if fiat_cod is not None:
         try:
             # Получаем данные о курсе
-            currency_rates2 = get_currency_rate(fiat_cod)
+            currency_rates = get_currency_rate(fiat_cod)
+            dates = list(currency_rates.keys())
+            rates = list(currency_rates.values())
             # Строим график
-            plot_currency_rate(currency_rates2, f"{fiat_name} к рублю")
+            plot_currency_rate(dates, rates, f"{fiat_name} к рублю")
         except Exception as e:
-            print(f"Произошла ошибка: {e}")
+            messagebox.showerror("Ошибка", f"Произошла ошибка: {e}")
     else:
         cr_coin = combobox_crypta.get()
         ids = cr_coin.lower()
@@ -252,48 +271,19 @@ def get_price_graf():
         try:
             response = requests.get(url, headers=headers)
 
-
-            def unix_to_readable(unix_time):
-                return datetime.fromtimestamp(unix_time / 1000).strftime('%d.%m')
-
             if response.status_code == 200:
                 data = response.json()
 
                 graf_time = [row[0] for row in data['prices']]
-                readable_times = [unix_to_readable(time) for time in graf_time]
+                dates = [datetime.fromtimestamp(ts / 1000).date() for ts in graf_time]
+                rates = [row[1] for row in data['prices']]
 
-                graf_price = [row[1] for row in data['prices']]
-
-                x = np.array(readable_times)
-                y = np.array(graf_price)
-                fig, ax = plt.subplots()
-                ax.plot(x, y)
-                ax.set_title(f'График курса {cr_coin} к {tg0} за {days_graf} дней')
-                ax.set_xlabel('Даты')
-                ax.set_ylabel(f'Курс {cr_coin} к {tg0}')
-                x_ticks = np.arange(0, days_graf, days_graf//12)
-                ax.set_xticks(x_ticks)
-                ax.grid(True)
-
-
-                def cancel_wind_graf():
-                    plt.close(fig)
-                    wind_graf.grab_release()
-                    wind_graf.destroy()
-                    button_graf.pack_forget()
-
-                wind_graf = Toplevel()
-                wind_graf.title(f"График курса {cr_coin}")
-                wind_graf.geometry("1000x400")
-                wind_graf.grab_set()
-                wind_graf.protocol("WM_DELETE_WINDOW", lambda: cancel_wind_graf())
-
-                canvas = FigureCanvasTkAgg(fig, master=wind_graf)
-                canvas.draw()
-                canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
+                plot_currency_rate(dates, rates, f"{cr_coin} к рублю")
             else:
-                messagebox.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
+                if response.status_code == 429:
+                    messagebox.showerror("Ошибка", f"Ошибка при получении данных: слишком много запросов!")
+                else:
+                    messagebox.showerror("Ошибка", f"Ошибка при получении данных: {response.status_code}")
 
         except requests.exceptions.RequestException as e:
             messagebox.showerror("Ошибка", f"Произошла ошибка при выполнении запроса: {e}")
@@ -315,7 +305,6 @@ with open(resource_path("frog2.ico"), 'wb') as image:
 window = Tk()
 window.iconbitmap(resource_path("frog2.ico"))
 window.resizable(False, False)
-# window.attributes("-toolwindow", True)
 window.title("Актуальные Курсы ВАлют более 160 стран")
 window.geometry("480x320")
 window.protocol("WM_DELETE_WINDOW", lambda: quit1())
@@ -413,20 +402,20 @@ enabled_checkbutton = Checkbutton(f1, text="КриптоВАлюта", variable=
 enabled_checkbutton.grid(row=2, column=0, columnspan=2, padx=10, pady=5, sticky=EW)
 
 
-# Кнопка получения курса
+# --------------------------Кнопка получения курса----------------------------------------------
 
-def button_kva_enter(event):
+def button_kva_enter(_):
     global img_hover_kva
-    button_kva.config(image=img_hover_kva)
+    button_kva.config(image=img_hover_kva)  # type: ignore
 
 
-def button_kva_leave(event):
+def button_kva_leave(_):
     global img_kva
-    button_kva.config(image=img_kva)
+    button_kva.config(image=img_kva)  # type: ignore
 
 img_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva3.gif")))
 img_hover_kva = ImageTk.PhotoImage(Image.open(resource_path("btn_kva4.gif")))
-button_kva = Button(f1, image=img_kva, command=choice, relief='flat', borderwidth=0)
+button_kva = Button(f1, image=img_kva, command=choice, relief='flat', borderwidth=0)  # type: ignore
 button_kva.grid(row=2, column=2, padx=10, sticky=E)
 button_kva.bind("<Enter>", button_kva_enter)
 button_kva.bind("<Leave>", button_kva_leave)
@@ -435,28 +424,27 @@ t_label1 = ttk.Label(f2, text='На ', font="Helvetica 10")
 t_label2 = ttk.Label(f2, text='', font="Helvetica 10 bold")
 t_label3 = ttk.Label(f3, text='Курс ', font="Helvetica 10")
 t_label4 = ttk.Label(f3, text='', font="Helvetica 10 bold")
-#t_label5 = ttk.Label(f3, text=' составляет  ', font="Helvetica 10")
 t_label6 = ttk.Label(f4, text='', font="Helvetica 14 bold",
                      foreground='Red', background='White', borderwidth=1, relief=SOLID)
 t_label7 = ttk.Label(f4, text='', font="Helvetica 10 bold")
 t_label8 = ttk.Label(f5, text='')
 
 
-# Кнопка получения графика криптовалюты
+# ----------------------Кнопка получения графика криптовалюты------------------------------
 
-def button_graf_enter(event):
+def button_graf_enter(_):
     global img_hover_graf
-    button_graf.config(image=img_hover_graf)
+    button_graf.config(image=img_hover_graf)  # type: ignore
 
 
-def button_graf_leave(event):
+def button_graf_leave(_):
     global img_graf
-    button_graf.config(image=img_graf)
+    button_graf.config(image=img_graf)  # type: ignore
 
 
 img_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf3.gif")))
 img_hover_graf = ImageTk.PhotoImage(Image.open(resource_path("btn_graf4.gif")))
-button_graf = Button(f_button_graf, image=img_graf, command=get_price_graf, borderwidth=3)
+button_graf = Button(f_button_graf, image=img_graf, command=get_price_graf, borderwidth=3)  # type: ignore
 button_graf.bind("<Enter>", button_graf_enter)
 button_graf.bind("<Leave>", button_graf_leave)
 
@@ -464,14 +452,13 @@ button_graf.bind("<Leave>", button_graf_leave)
 # ------------------------------Загрузка лягушки------------------------------
 
 frog = Image.open(resource_path("frog4.gif"))
-# frog = frog.resize((150, 150))
 frog_tk = ImageTk.PhotoImage(frog)
-label_frog = Label(f_button_graf, image=frog_tk)
+label_frog = Label(f_button_graf, image=frog_tk)  # type: ignore
 label_frog.pack(side=RIGHT)
 
 kva = Image.open(resource_path("kva2.gif"))
 kva_tk = ImageTk.PhotoImage(kva)
-label_kva = Label(f2, image=kva_tk)
+label_kva = Label(f2, image=kva_tk)  # type: ignore
 label_kva.pack(side=LEFT)
 
 
@@ -598,7 +585,6 @@ def select_fiat_coins():
     wind_select.rowconfigure(1, weight=1)
     wind_select.rowconfigure(2, weight=1)
     wind_select.rowconfigure(3, weight=1)
- #   wind_select.rowconfigure(4, weight=1)
 
     ttk.Button(wind_select, text="Добавить", command=add_fiat).grid(row=0, column=2, padx=6, pady=6)
     ttk.Button(wind_select, text="Удалить", command=delete).grid(row=0, column=7, padx=5, pady=5)
@@ -627,18 +613,18 @@ def select_fiat_coins():
 
 # ------------------------------------Кнопка настройки-----------------------------
 
-def settings_enter(event):
+def settings_enter(_):
     global img_hover_settings
-    button_settings.config(image=img_hover_settings)
+    button_settings.config(image=img_hover_settings)  # type: ignore
 
 
-def settings_leave(event):
+def settings_leave(_):
     global img_settings
-    button_settings.config(image=img_settings)
+    button_settings.config(image=img_settings)  # type: ignore
 
 img_settings = ImageTk.PhotoImage(Image.open(resource_path("settings1.gif")))
 img_hover_settings = ImageTk.PhotoImage(Image.open(resource_path("settings2.gif")))
-button_settings = Button(f1, image=img_settings, command=select_fiat_coins, relief='flat', borderwidth=0)
+button_settings = Button(f1, image=img_settings, command=select_fiat_coins, relief='flat', borderwidth=0)  # type: ignore
 button_settings.grid(row=0, column=0, padx=(0,5), sticky=E)
 button_settings.bind("<Enter>", settings_enter)
 button_settings.bind("<Leave>", settings_leave)
