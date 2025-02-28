@@ -629,4 +629,27 @@ button_settings.grid(row=0, column=0, padx=(0,5), sticky=E)
 button_settings.bind("<Enter>", settings_enter)
 button_settings.bind("<Leave>", settings_leave)
 
+# --------------------------- загрузка default.kva ----------------------
+
+file_name = 'default.kva'
+file_path = os.path.join(os.path.dirname(__file__), file_name)
+try:
+    if os.path.exists(file_path):
+        list_test = []
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as f:
+                list_test.extend(f.read().split('\n'))
+        if len(list_test) > 0:
+            list_fiat_FIAT.clear()
+            for fiat in list_test:
+                for coins in list_fiat_all_FIAT:
+                    if fiat == coins.country:
+                        list_fiat_FIAT.append(coins)
+            f_i = list(map(lambda p: p.country, list_fiat_FIAT))
+            combobox_fiat['values'] = f_i
+            combobox_fiat.current(0)
+            fi_var.set(combobox_fiat['values'][0])
+except Exception as exc:
+    messagebox.showerror("Ошибка", f"Произошла ошибка: {exc}")
+
 window.mainloop()
